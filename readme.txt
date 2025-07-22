@@ -4,11 +4,11 @@ Tags: woocommerce, bgn, euro, currency, prices
 Requires at least: 5.6
 Tested up to: 6.8
 Requires PHP: 7.4
-Stable tag: 1.3.7
+Stable tag: 1.3.8
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Показва цените в лева и евро в WooCommerce, използвайки фиксирания курс на БНБ: 1 EUR = 1.95583 BGN. Работи на всички страници – продукти, количка, checkout и имейли. Задължително според закона в България от 1 август 2025 г.
+Показва цените в лева и евро във WooCommerce с фиксиран курс на БНБ: 1 EUR = 1.95583 BGN. Задължително от 1.08.2025 г.
 
 == Description ==
 

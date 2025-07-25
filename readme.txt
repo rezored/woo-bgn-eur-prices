@@ -4,7 +4,7 @@ Tags: woocommerce, bgn, euro, currency, prices
 Requires at least: 5.6
 Tested up to: 6.8
 Requires PHP: 7.4
-Stable tag: 1.4.2
+Stable tag: 1.4.3
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -52,6 +52,11 @@ License URI: https://www.gnu.org/licenses/gpl-2.0.html
 2. Checkout страница с пояснение за курса
 
 == Changelog ==
+
+= 1.4.3 =
+* Подобрена сигурност - всички изходи са правилно ескейпнати
+* Подобрена интернационализация - всички текстове са преводими
+* Съответствие с WordPress стандартите
 
 = 1.4.0 =
 * Добавена поддръжка за WooCommerce Blocks

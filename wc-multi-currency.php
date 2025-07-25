@@ -3,7 +3,7 @@
 /**
  * Plugin Name: Prices in BGN and EUR
  * Description: Displays product prices in BGN and EUR using the fixed exchange rate: 1 EUR = 1.95583 BGN.
- * Version: 1.4.2
+ * Version: 1.4.3
  * Author: Rezored
  * License: GPLv2 or later
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -82,7 +82,7 @@ class Multi_Currency
         echo '<tr class="eur-note">
             <th></th>
             <td style="font-size: 12px; color: #777; padding-top: 5px; border-top: none;">
-                <em>Сумата в евро се получава чрез конвертиране на цената по фиксирания обменен курс на БНБ: <br>1 EUR = 1.95583 BGN</em>
+                <em>' . esc_html__('Сумата в евро се получава чрез конвертиране на цената по фиксирания обменен курс на БНБ:', 'prices-in-bgn-and-eur') . ' <br>1 EUR = 1.95583 BGN</em>
             </td>
         </tr>';
     }
@@ -119,7 +119,7 @@ class Multi_Currency
                         var price = parseFloat(priceMatch[0].replace(',', '.'));
                         if (price > 0) {
                             // Calculate EUR (using PHP rate for consistency)
-                            var eurRate = <?php echo self::get_eur_rate(); ?>;
+                            var eurRate = <?php echo esc_js(self::get_eur_rate()); ?>;
                             var eurPrice = (price / eurRate).toFixed(2);
                             
                             // Add EUR price
@@ -138,7 +138,7 @@ class Multi_Currency
                         if (priceMatch) {
                             var price = parseFloat(priceMatch[0].replace(',', '.'));
                             if (price > 0) {
-                                var eurRate = <?php echo self::get_eur_rate(); ?>;
+                                var eurRate = <?php echo esc_js(self::get_eur_rate()); ?>;
                                 var eurPrice = (price / eurRate).toFixed(2);
                                 $this.append(' <span class="amount-eur">(' + eurPrice + ' €)</span>');
                             }
@@ -148,7 +148,7 @@ class Multi_Currency
                 
                 // Add disclaimer for WooCommerce Blocks
                 if ($('.wc-block-cart__totals-title').length > 0 && $('.eur-disclaimer-blocks').length === 0) {
-                    $('.wc-block-cart__totals-title').after('<div class="eur-disclaimer-blocks" style="font-size: 12px; color: #777; margin-top: 10px; padding: 10px; background: #f9f9f9; border-radius: 4px;"><em>Сумата в евро се получава чрез конвертиране на цената по фиксирания обменен курс на БНБ: <br>1 EUR = 1.95583 BGN</em></div>');
+                                         $('.wc-block-cart__totals-title').after('<div class="eur-disclaimer-blocks" style="font-size: 12px; color: #777; margin-top: 10px; padding: 10px; background: #f9f9f9; border-radius: 4px;"><em><?php echo esc_html__("Сумата в евро се получава чрез конвертиране на цената по фиксирания обменен курс на БНБ:", "prices-in-bgn-and-eur"); ?> <br>1 EUR = 1.95583 BGN</em></div>');
                 }
             }
             
@@ -202,9 +202,9 @@ add_action('admin_menu', function () {
         <div class="wrap">
             <h1>Цени в лева и евро за WooCommerce</h1>
             <p>Благодарим, че използвате плъгина!</p>
-            <p><strong>Версия 1.4.2:</strong> Добавена поддръжка за WooCommerce Blocks с подобрена производителност!</p>
-            <p>Ако желаете да ме подкрепите, може да го направите тук:
-                <a href="https://coff.ee/rezored" target="_blank" class="button button-primary">☕ Подкрепи ме</a>
+            <p><strong><?php esc_html_e('Версия 1.4.3:', 'prices-in-bgn-and-eur'); ?></strong> <?php esc_html_e('Добавена поддръжка за WooCommerce Blocks с подобрена производителност и сигурност!', 'prices-in-bgn-and-eur'); ?></p>
+            <p><?php esc_html_e('Ако желаете да ме подкрепите, може да го направите тук:', 'prices-in-bgn-and-eur'); ?>
+                <a href="<?php echo esc_url('https://coff.ee/rezored'); ?>" target="_blank" class="button button-primary">☕ <?php esc_html_e('Подкрепи ме', 'prices-in-bgn-and-eur'); ?></a>
             </p>
             <hr>
             <h2>Настройки (в бъдеще)</h2>

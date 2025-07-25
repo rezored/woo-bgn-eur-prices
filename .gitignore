@@ -1,0 +1,265 @@
+# WordPress Plugin Development .gitignore
+
+# ===========================================
+# PLUGIN PACKAGING
+# ===========================================
+
+# Plugin ZIP files (distribution packages)
+*.zip
+woo-bgn-eur-prices.zip
+prices-in-bgn-and-eur.zip
+
+# Plugin build directories
+/build/
+/dist/
+/release/
+
+# ===========================================
+# OPERATING SYSTEM FILES
+# ===========================================
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+*.lnk
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+._*
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+.AppleDB
+.AppleDesktop
+Network Trash Folder
+Temporary Items
+.apdisk
+
+# Linux
+*~
+.fuse_hidden*
+.directory
+.Trash-*
+.nfs*
+
+# ===========================================
+# DEVELOPMENT ENVIRONMENT
+# ===========================================
+
+# IDE and Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.project
+.settings/
+.classpath
+
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+
+# Vim
+*.swp
+*.swo
+*.swn
+*.bak
+
+# Emacs
+*~
+\#*\#
+/.emacs.desktop
+/.emacs.desktop.lock
+*.elc
+auto-save-list
+tramp
+.\#*
+
+# ===========================================
+# WORDPRESS SPECIFIC
+# ===========================================
+
+# WordPress core files (if testing locally)
+wp-config.php
+wp-content/uploads/
+wp-content/cache/
+wp-content/backup-db/
+wp-content/backups/
+wp-content/blogs.dir/
+wp-content/upgrade/
+wp-content/uploads/
+wp-content/mu-plugins/
+wp-content/wp-cache-config.php
+wp-content/plugins/hello.php
+
+# WordPress debug logs
+debug.log
+error_log
+*.log
+
+# ===========================================
+# DEVELOPMENT TOOLS
+# ===========================================
+
+# Node.js (if using build tools)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+yarn.lock
+
+# Composer (PHP dependency manager)
+vendor/
+composer.lock
+composer.phar
+
+# PHP
+*.php~
+*.php.bak
+*.php.swp
+*.php.swo
+
+# ===========================================
+# TESTING AND QUALITY ASSURANCE
+# ===========================================
+
+# Test coverage reports
+coverage/
+*.coverage
+*.lcov
+
+# PHPUnit
+.phpunit.result.cache
+phpunit.xml.bak
+
+# Code quality tools
+.phpcs.cache
+.phpcbf.cache
+phpstan.neon
+phpstan-result.cache
+
+# ===========================================
+# TEMPORARY FILES
+# ===========================================
+
+# Temporary files
+*.tmp
+*.temp
+*.cache
+*.bak
+*.backup
+*.old
+*.orig
+*.rej
+
+# Archive files
+*.tar
+*.tar.gz
+*.tgz
+*.rar
+*.7z
+
+# ===========================================
+# SECURITY AND SENSITIVE DATA
+# ===========================================
+
+# Configuration files with sensitive data
+config.php
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# API keys and secrets
+api-keys.txt
+secrets.txt
+credentials.txt
+
+# Database dumps
+*.sql
+*.sql.gz
+
+# ===========================================
+# PLUGIN SPECIFIC
+# ===========================================
+
+# Plugin specific temporary files
+plugin-temp/
+test-data/
+sample-data/
+
+# Local development overrides
+local-config.php
+local-settings.php
+
+# ===========================================
+# DOCUMENTATION BUILD
+# ===========================================
+
+# Generated documentation
+/docs/build/
+/docs/_build/
+/docs/api/
+
+# ===========================================
+# MISCELLANEOUS
+# ===========================================
+
+# Backup files
+*.backup
+*.bak
+*.old
+*.orig
+
+# Compressed files
+*.gz
+*.bz2
+*.xz
+
+# Binary files
+*.exe
+*.dll
+*.so
+*.dylib
+
+# ===========================================
+# CUSTOM EXCLUSIONS
+# ===========================================
+
+# Add any project-specific files here
+# my-custom-file.txt
+# project-specific-directory/
+
+# ===========================================
+# NOTES
+# ===========================================
+
+# This .gitignore file is designed for WordPress plugin development
+# It excludes common files that shouldn't be tracked in version control
+# 
+# Key exclusions:
+# - Plugin ZIP files (distribution packages)
+# - Operating system files
+# - IDE/Editor specific files
+# - WordPress core files (if testing locally)
+# - Development tool files
+# - Temporary and backup files
+# - Sensitive configuration files
+#
+# If you need to include a file that's being ignored, use:
+# git add -f filename
+#
+# Last updated: [CURRENT_DATE]
+# Maintainer: Rezored

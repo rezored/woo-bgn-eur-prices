@@ -4,7 +4,7 @@ Tags: woocommerce, bgn, euro, currency, prices
 Requires at least: 5.6
 Tested up to: 6.8
 Requires PHP: 7.4
-Stable tag: 1.4.5
+Stable tag: 1.4.6
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -52,6 +52,12 @@ You can send a "thank you" through the link in the plugin settings ❤️
 2. Checkout page with exchange rate explanation
 
 == Changelog ==
+
+= 1.4.6 =
+* Fixed WordPress enqueue compliance - removed inline scripts and styles
+* Enhanced compatibility - using proper WordPress functions for resource loading
+* Improved security - proper script localization with wp_localize_script()
+* Enhanced performance - CSS and JS files are separated and cached
 
 = 1.4.3 =
 * Improved security - all outputs are properly escaped

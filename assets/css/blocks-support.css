@@ -1,0 +1,10 @@
+.amount-eur { 
+    color: #666; 
+    font-size: 0.9em; 
+    font-weight: normal; 
+}
+
+.wc-block-components-product-price__value .amount-eur,
+.wc-block-formatted-money-amount .amount-eur { 
+    margin-left: 5px; 
+} 

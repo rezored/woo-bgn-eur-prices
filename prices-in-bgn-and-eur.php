@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Prices in BGN and EUR
  * Description: Displays prices in BGN and EUR in WooCommerce using the fixed BNB exchange rate.
- * Version: 1.4.5
+ * Version: 1.4.6
  * Author: rezored
  * Requires at least: 5.6
  * Requires PHP: 7.4
@@ -31,7 +31,7 @@ class Multi_Currency {
             add_filter('woocommerce_cart_total', [__CLASS__, 'display_price_in_multiple_currencies'], 10);
 
             // WooCommerce Blocks support
-            add_action('wp_footer', [__CLASS__, 'add_blocks_support_script']);
+            add_action('wp_enqueue_scripts', [__CLASS__, 'enqueue_blocks_support_assets']);
         }
     }
 
@@ -84,57 +84,38 @@ class Multi_Currency {
         </tr>';
     }
 
-    public static function add_blocks_support_script() {
+    public static function enqueue_blocks_support_assets() {
         if (get_woocommerce_currency() !== 'BGN') return;
 
         if (!is_cart() && !is_checkout() && !is_shop() && !is_product()) return;
 
-        ?>
-        <script type="text/javascript">
-            jQuery(function($){
-                function addEurToBlocks() {
-                    var eurRate = <?php echo esc_js(self::get_eur_rate()); ?>;
+        // Enqueue CSS
+        wp_enqueue_style(
+            'prices-bgn-eur-blocks',
+            plugin_dir_url(__FILE__) . 'assets/css/blocks-support.css',
+            [],
+            '1.4.6'
+        );
 
-                    function appendEur($el) {
-                        if ($el.find('.amount-eur').length || $el.text().includes('€')) return;
-                        var match = $el.text().match(/[0-9.,]+/);
-                        if (!match) return;
-                        var price = parseFloat(match[0].replace(',', '.'));
-                        if (price > 0) {
-                            var eurPrice = (price / eurRate).toFixed(2);
-                            $el.append(' <span class="amount-eur">(' + eurPrice + ' €)</span>');
-                        }
-                    }
+        // Enqueue JavaScript
+        wp_enqueue_script(
+            'prices-bgn-eur-blocks',
+            plugin_dir_url(__FILE__) . 'assets/js/blocks-support.js',
+            ['jquery'],
+            '1.4.6',
+            true
+        );
 
-                    $('.wc-block-components-product-price__value, .wc-block-formatted-money-amount, .wc-block-components-totals-item__value').each(function(){
-                        appendEur($(this));
-                    });
-
-                    if ($('.wc-block-cart__totals-title').length && !$('.eur-disclaimer-blocks').length) {
-                        $('.wc-block-cart__totals-title').after(
-                            '<div class="eur-disclaimer-blocks" style="font-size:12px;color:#777;margin-top:10px;padding:10px;background:#f9f9f9;border-radius:4px;">' +
-                            '<em><?php echo esc_js(__('Сумата в евро се получава чрез конвертиране на цената по фиксирания обменен курс на БНБ:', 'prices-in-bgn-and-eur')); ?> <br>1 EUR = 1.95583 BGN</em>' +
-                            '</div>'
-                        );
-                    }
-                }
-
-                addEurToBlocks();
-                setTimeout(addEurToBlocks, 500);
-
-                $(document.body).on('updated_wc_block updated_cart_totals', function() {
-                    setTimeout(addEurToBlocks, 100);
-                });
-
-                new MutationObserver(addEurToBlocks).observe(document.body, {childList: true, subtree: true});
-            });
-        </script>
-        <style>
-            .amount-eur { color:#666; font-size:0.9em; font-weight:normal; }
-            .wc-block-components-product-price__value .amount-eur,
-            .wc-block-formatted-money-amount .amount-eur { margin-left:5px; }
-        </style>
-        <?php
+        // Localize script with data
+        wp_localize_script(
+            'prices-bgn-eur-blocks',
+            'pricesBgnEurData',
+            [
+                'eurRate' => self::get_eur_rate(),
+                'disclaimerText' => __('Сумата в евро се получава чрез конвертиране на цената по фиксирания обменен курс на БНБ:', 'prices-in-bgn-and-eur'),
+                'rateText' => '1 EUR = 1.95583 BGN'
+            ]
+        );
     }
 }
 
@@ -149,17 +130,19 @@ add_action('admin_menu', function () {
         'manage_options',
         'prices-bgn-eur-settings',
         function () { ?>
-            <div class="wrap">
-                <h1><?php esc_html_e('Prices in BGN and EUR for WooCommerce', 'prices-in-bgn-and-eur'); ?></h1>
-                <p><?php esc_html_e('Thank you for using the plugin!', 'prices-in-bgn-and-eur'); ?></p>
-                <p><strong><?php esc_html_e('Version 1.4.4:', 'prices-in-bgn-and-eur'); ?></strong> <?php esc_html_e('Improved security, formatting and WooCommerce Blocks support.', 'prices-in-bgn-and-eur'); ?></p>
-                <p><?php esc_html_e('If you would like to support me, you can do so here:', 'prices-in-bgn-and-eur'); ?>
-                    <a href="<?php echo esc_url('https://coff.ee/rezored'); ?>" target="_blank" class="button button-primary">☕ <?php esc_html_e('Support me', 'prices-in-bgn-and-eur'); ?></a>
-                </p>
-                <hr>
-                <h2><?php esc_html_e('Settings (in the future)', 'prices-in-bgn-and-eur'); ?></h2>
-                <p><?php esc_html_e('Expect settings for display, formats and more.', 'prices-in-bgn-and-eur'); ?></p>
-            </div>
-        <?php }
+<div class="wrap">
+    <h1><?php esc_html_e('Prices in BGN and EUR for WooCommerce', 'prices-in-bgn-and-eur'); ?></h1>
+    <p><?php esc_html_e('Thank you for using the plugin!', 'prices-in-bgn-and-eur'); ?></p>
+    <p><strong><?php esc_html_e('Version 1.4.6:', 'prices-in-bgn-and-eur'); ?></strong>
+        <?php esc_html_e('Fixed WordPress enqueue compliance and improved security.', 'prices-in-bgn-and-eur'); ?></p>
+    <p><?php esc_html_e('If you would like to support me, you can do so here:', 'prices-in-bgn-and-eur'); ?>
+        <a href="<?php echo esc_url('https://coff.ee/rezored'); ?>" target="_blank" class="button button-primary">☕
+            <?php esc_html_e('Support me', 'prices-in-bgn-and-eur'); ?></a>
+    </p>
+    <hr>
+    <h2><?php esc_html_e('Settings (in the future)', 'prices-in-bgn-and-eur'); ?></h2>
+    <p><?php esc_html_e('Expect settings for display, formats and more.', 'prices-in-bgn-and-eur'); ?></p>
+</div>
+<?php }
     );
 });

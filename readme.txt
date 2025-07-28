@@ -4,73 +4,73 @@ Tags: woocommerce, bgn, euro, currency, prices
 Requires at least: 5.6
 Tested up to: 6.8
 Requires PHP: 7.4
-Stable tag: 1.4.3
+Stable tag: 1.4.5
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Показва цените в лева и евро във WooCommerce с фиксиран курс на БНБ: 1 EUR = 1.95583 BGN. Задължително от 1.08.2025 г.
+Displays prices in BGN and EUR in WooCommerce using the fixed BNB exchange rate: 1 EUR = 1.95583 BGN. Required by law from 1.08.2025.
 
 == Description ==
 
-**Изискване по закон от 1.08.2025 г.:** Всички онлайн магазини в България трябва да показват цените си както в лева, така и в евро.
+**Legal requirement from 1.08.2025:** All online stores in Bulgaria must display their prices in both BGN and EUR.
 
-Този плъгин автоматично добавя показване на цената в евро до лева (BGN), използвайки фиксирания курс на БНБ – 1 EUR = 1.95583 BGN.
+This plugin automatically adds EUR price display alongside BGN prices, using the fixed BNB exchange rate – 1 EUR = 1.95583 BGN.
 
-Работи на:
-- Страници с продукти
-- Количка и checkout (включително WooCommerce Blocks)
-- Мини количка
-- Имейли с поръчки
+Works on:
+- Product pages
+- Cart and checkout (including WooCommerce Blocks)
+- Mini cart
+- Order emails
 
 == Features ==
-* Автоматично изчисляване на цена в евро от BGN
-* Използва фиксиран курс на БНБ: 1 EUR = 1.95583 BGN
-* Работи на всички ключови страници и имейли
-* Не изисква допълнителна конфигурация
-* Леко и бързо
+* Automatic EUR price calculation from BGN
+* Uses fixed BNB exchange rate: 1 EUR = 1.95583 BGN
+* Works on all key pages and emails
+* No additional configuration required
+* Lightweight and fast
 
 == Installation ==
 
-1. Качете папката на плъгина в директорията `/wp-content/plugins/`.
-2. Активирайте го от менюто **Разширения** в WordPress.
-3. Готово – плъгинът започва да работи веднага.
+1. Upload the plugin folder to the `/wp-content/plugins/` directory.
+2. Activate it from the **Plugins** menu in WordPress.
+3. Done – the plugin starts working immediately.
 
 == Frequently Asked Questions ==
 
-= Ще работи ли с други валути освен BGN? =
-Не, плъгинът е предназначен само за магазини с основна валута BGN.
+= Will it work with currencies other than BGN? =
+No, the plugin is designed only for stores with BGN as the primary currency.
 
-= Мога ли да променя курса? =
-Не, курсът е фиксиран по закон. Ако имате нужда от динамичен курс – използвайте много-валутен плъгин.
+= Can I change the exchange rate? =
+No, the rate is fixed by law. If you need a dynamic rate – use a multi-currency plugin.
 
-= Как мога да подкрепя разработчика? =
-Може да изпратите "благодаря" чрез линка в настройките на плъгина ❤️
+= How can I support the developer? =
+You can send a "thank you" through the link in the plugin settings ❤️
 
 == Screenshots ==
 
-1. Пример с показани цени в BGN и EUR
-2. Checkout страница с пояснение за курса
+1. Example with displayed prices in BGN and EUR
+2. Checkout page with exchange rate explanation
 
 == Changelog ==
 
 = 1.4.3 =
-* Подобрена сигурност - всички изходи са правилно ескейпнати
-* Подобрена интернационализация - всички текстове са преводими
-* Съответствие с WordPress стандартите
+* Improved security - all outputs are properly escaped
+* Improved internationalization - all texts are translatable
+* WordPress standards compliance
 
 = 1.4.0 =
-* Добавена поддръжка за WooCommerce Blocks
-* Подобрена съвместимост с най-новите версии на WordPress
+* Added WooCommerce Blocks support
+* Improved compatibility with latest WordPress versions
 
 = 1.3.7 =
-* Добавено пояснение под тотала в количка и checkout
-* Добавена готовност за административна страница
+* Added explanation under totals in cart and checkout
+* Added readiness for admin page
 
 = 1.3.0 =
-* Показване на цени в евро на всички страници и имейли
+* EUR price display on all pages and emails
 
 == Upgrade Notice ==
 
 = 1.3.7 =
-Препоръчителен ъпдейт – добавена е допълнителна информация в checkout и admin панел.
+Recommended update – additional information added in checkout and admin panel.
 

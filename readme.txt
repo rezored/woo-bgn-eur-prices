@@ -8,60 +8,61 @@ Stable tag: 1.4.6
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Displays prices in BGN and EUR in WooCommerce using the fixed BNB exchange rate: 1 EUR = 1.95583 BGN. Required by law from 1.08.2025.
+Display WooCommerce prices in BGN and EUR using the fixed BNB exchange rate (1 EUR = 1.95583 BGN). Compliant with the new Bulgarian law effective 1 August 2025.
 
 == Description ==
 
-**Legal requirement from 1.08.2025:** All online stores in Bulgaria must display their prices in both BGN and EUR.
+**Legal requirement from 1 August 2025:**  
+All online stores in Bulgaria must display their prices in both BGN and EUR.
 
-This plugin automatically adds EUR price display alongside BGN prices, using the fixed BNB exchange rate – 1 EUR = 1.95583 BGN.
+This lightweight plugin automatically adds EUR price display alongside BGN prices, using the fixed BNB exchange rate (1 EUR = 1.95583 BGN).
 
-Works on:
+**Works on:**
 - Product pages
 - Cart and checkout (including WooCommerce Blocks)
 - Mini cart
 - Order emails
 
 == Features ==
-* Automatic EUR price calculation from BGN
-* Uses fixed BNB exchange rate: 1 EUR = 1.95583 BGN
-* Works on all key pages and emails
-* No additional configuration required
-* Lightweight and fast
+- ✅ Automatic EUR price calculation from BGN  
+- ✅ Uses fixed BNB exchange rate: 1 EUR = 1.95583 BGN  
+- ✅ Works on all key pages and emails  
+- ✅ No additional configuration required  
+- ✅ Lightweight and fast  
 
 == Installation ==
 
-1. Upload the plugin folder to the `/wp-content/plugins/` directory.
+1. Upload the plugin folder to `/wp-content/plugins/`.
 2. Activate it from the **Plugins** menu in WordPress.
-3. Done – the plugin starts working immediately.
+3. That’s it – the plugin works immediately!
 
 == Frequently Asked Questions ==
 
 = Will it work with currencies other than BGN? =
-No, the plugin is designed only for stores with BGN as the primary currency.
+No. This plugin is designed only for stores with BGN as the primary currency.
 
 = Can I change the exchange rate? =
-No, the rate is fixed by law. If you need a dynamic rate – use a multi-currency plugin.
+No. The rate is fixed by law. For dynamic rates, use a multi-currency plugin.
 
 = How can I support the developer? =
 You can send a "thank you" through the link in the plugin settings ❤️
 
 == Screenshots ==
 
-1. Example with displayed prices in BGN and EUR
-2. Checkout page with exchange rate explanation
+1. Product page with prices in BGN and EUR
+2. Checkout page showing both currencies
 
 == Changelog ==
 
 = 1.4.6 =
-* Fixed WordPress enqueue compliance - removed inline scripts and styles
-* Enhanced compatibility - using proper WordPress functions for resource loading
-* Improved security - proper script localization with wp_localize_script()
-* Enhanced performance - CSS and JS files are separated and cached
+* Fixed WordPress enqueue compliance – removed inline scripts/styles
+* Enhanced compatibility – using proper WordPress functions for resource loading
+* Improved security – proper script localization with `wp_localize_script()`
+* Enhanced performance – CSS and JS files are separated and cached
 
 = 1.4.3 =
-* Improved security - all outputs are properly escaped
-* Improved internationalization - all texts are translatable
+* Improved security – all outputs are properly escaped
+* Improved internationalization – all texts are translatable
 * WordPress standards compliance
 
 = 1.4.0 =
@@ -79,4 +80,3 @@ You can send a "thank you" through the link in the plugin settings ❤️
 
 = 1.3.7 =
 Recommended update – additional information added in checkout and admin panel.
-

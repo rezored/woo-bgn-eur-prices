@@ -9,6 +9,7 @@
  * License: GPLv2 or later
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain: prices-in-bgn-and-eur
+ * Icon: icon-128x128.png
  */
 
 namespace Prices_BGN_EUR\Front_End;

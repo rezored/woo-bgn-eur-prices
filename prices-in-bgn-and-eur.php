@@ -3,7 +3,7 @@
 /**
  * Plugin Name: Prices in BGN and EUR
  * Description: Displays prices in BGN and EUR in WooCommerce using the fixed BNB exchange rate.
- * Version: 1.4.6
+ * Version: 1.4.8
  * Author: rezored
  * Requires at least: 5.6
  * Requires PHP: 7.4
@@ -130,7 +130,7 @@ class Multi_Currency
             'prices-bgn-eur-blocks',
             plugin_dir_url(__FILE__) . 'assets/css/blocks-support.css',
             [],
-            '1.4.6'
+            '1.4.8'
         );
 
         // Enqueue JavaScript
@@ -138,7 +138,7 @@ class Multi_Currency
             'prices-bgn-eur-blocks',
             plugin_dir_url(__FILE__) . 'assets/js/blocks-support.js',
             ['jquery'],
-            '1.4.6',
+            '1.4.8',
             true
         );
 
@@ -185,8 +185,8 @@ add_action('admin_menu', function () {
 <div class="wrap">
     <h1><?php esc_html_e('Prices in BGN and EUR for WooCommerce', 'prices-in-bgn-and-eur'); ?></h1>
     <p><?php esc_html_e('Thank you for using the plugin!', 'prices-in-bgn-and-eur'); ?></p>
-    <p><strong><?php esc_html_e('Version 1.4.6:', 'prices-in-bgn-and-eur'); ?></strong>
-        <?php esc_html_e('Fixed WordPress enqueue compliance and improved security.', 'prices-in-bgn-and-eur'); ?></p>
+    <p><strong><?php esc_html_e('Version 1.4.8:', 'prices-in-bgn-and-eur'); ?></strong>
+        <?php esc_html_e('Fixed incorrect Euro conversion calculations. Improved price extraction for both traditional WooCommerce and WooCommerce Blocks elements.', 'prices-in-bgn-and-eur'); ?></p>
     <p><?php esc_html_e('If you would like to support me, you can do so here:', 'prices-in-bgn-and-eur'); ?>
         <a href="<?php echo esc_url('https://coff.ee/rezored'); ?>" target="_blank" class="button button-primary">☕
             <?php esc_html_e('Support me', 'prices-in-bgn-and-eur'); ?></a>

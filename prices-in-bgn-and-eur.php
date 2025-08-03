@@ -49,8 +49,28 @@ class Multi_Currency
         return number_format($eur, 2, wc_get_price_decimal_separator(), wc_get_price_thousand_separator());
     }
 
+    // Debug method to test conversion
+    public static function debug_conversion($bgn)
+    {
+        $rate = self::get_eur_rate();
+        $eur = floatval($bgn) / $rate;
+        return [
+            'bgn' => $bgn,
+            'rate' => $rate,
+            'eur' => $eur,
+            'formatted' => number_format($eur, 2, '.', ',')
+        ];
+    }
+
     private static function extract_numeric_price($price_html)
     {
+        // First try to extract price using a more specific pattern
+        if (preg_match('/([0-9]+[.,]?[0-9]*)\s*(лв|ЛВ|лв\.|ЛВ\.|BGN|€|EUR)/i', $price_html, $matches)) {
+            $clean = str_replace(',', '.', $matches[1]);
+            return floatval($clean);
+        }
+        
+        // Fallback to the original method
         $clean = preg_replace('/[^0-9.,]/', '', wp_strip_all_tags($price_html));
         $clean = str_replace(',', '.', $clean);
         return floatval($clean);
@@ -156,19 +176,19 @@ add_action('admin_menu', function () {
         'manage_options',
         'prices-bgn-eur-settings',
         function () { ?>
-        <div class="wrap">
-            <h1><?php esc_html_e('Prices in BGN and EUR for WooCommerce', 'prices-in-bgn-and-eur'); ?></h1>
-            <p><?php esc_html_e('Thank you for using the plugin!', 'prices-in-bgn-and-eur'); ?></p>
-            <p><strong><?php esc_html_e('Version 1.4.6:', 'prices-in-bgn-and-eur'); ?></strong>
-                <?php esc_html_e('Fixed WordPress enqueue compliance and improved security.', 'prices-in-bgn-and-eur'); ?></p>
-            <p><?php esc_html_e('If you would like to support me, you can do so here:', 'prices-in-bgn-and-eur'); ?>
-                <a href="<?php echo esc_url('https://coff.ee/rezored'); ?>" target="_blank" class="button button-primary">☕
-                    <?php esc_html_e('Support me', 'prices-in-bgn-and-eur'); ?></a>
-            </p>
-            <hr>
-            <h2><?php esc_html_e('Settings (in the future)', 'prices-in-bgn-and-eur'); ?></h2>
-            <p><?php esc_html_e('Expect settings for display, formats and more.', 'prices-in-bgn-and-eur'); ?></p>
-        </div>
+<div class="wrap">
+    <h1><?php esc_html_e('Prices in BGN and EUR for WooCommerce', 'prices-in-bgn-and-eur'); ?></h1>
+    <p><?php esc_html_e('Thank you for using the plugin!', 'prices-in-bgn-and-eur'); ?></p>
+    <p><strong><?php esc_html_e('Version 1.4.6:', 'prices-in-bgn-and-eur'); ?></strong>
+        <?php esc_html_e('Fixed WordPress enqueue compliance and improved security.', 'prices-in-bgn-and-eur'); ?></p>
+    <p><?php esc_html_e('If you would like to support me, you can do so here:', 'prices-in-bgn-and-eur'); ?>
+        <a href="<?php echo esc_url('https://coff.ee/rezored'); ?>" target="_blank" class="button button-primary">☕
+            <?php esc_html_e('Support me', 'prices-in-bgn-and-eur'); ?></a>
+    </p>
+    <hr>
+    <h2><?php esc_html_e('Settings (in the future)', 'prices-in-bgn-and-eur'); ?></h2>
+    <p><?php esc_html_e('Expect settings for display, formats and more.', 'prices-in-bgn-and-eur'); ?></p>
+</div>
 <?php }
     );
 });

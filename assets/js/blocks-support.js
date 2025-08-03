@@ -4,10 +4,16 @@ jQuery(function ($) {
 
         function appendEur($el) {
             if ($el.find('.amount-eur').length || $el.text().includes('€')) return;
-            var match = $el.text().match(/[0-9.,]+/);
+
+            // Improved price extraction - look for numbers followed by currency symbols
+            var text = $el.text();
+            var match = text.match(/([0-9]+[.,]?[0-9]*)\s*(лв|ЛВ|лв\.|ЛВ\.|BGN|€|EUR)/i);
             if (!match) return;
-            var price = parseFloat(match[0].replace(',', '.'));
-            if (price > 0) {
+
+            var priceStr = match[1].replace(',', '.');
+            var price = parseFloat(priceStr);
+
+            if (price > 0 && !isNaN(price)) {
                 var eurPrice = (price / eurRate).toFixed(2);
                 $el.append(' <span class="amount-eur">(' + eurPrice + ' €)</span>');
             }

@@ -64,8 +64,14 @@ class Multi_Currency
 
     private static function extract_numeric_price($price_html)
     {
-        // First try to extract price using a more specific pattern
+        // First try to extract price using a more specific pattern that handles both spaced and non-spaced currency symbols
         if (preg_match('/([0-9]+[.,]?[0-9]*)\s*(лв|ЛВ|лв\.|ЛВ\.|BGN|€|EUR)/i', $price_html, $matches)) {
+            $clean = str_replace(',', '.', $matches[1]);
+            return floatval($clean);
+        }
+        
+        // Try pattern without space between number and currency
+        if (preg_match('/([0-9]+[.,]?[0-9]*)(лв|ЛВ|лв\.|ЛВ\.|BGN|€|EUR)/i', $price_html, $matches)) {
             $clean = str_replace(',', '.', $matches[1]);
             return floatval($clean);
         }

@@ -8,6 +8,10 @@ jQuery(function ($) {
             // Improved price extraction - look for numbers followed by currency symbols
             var text = $el.text();
             var match = text.match(/([0-9]+[.,]?[0-9]*)\s*(лв|ЛВ|лв\.|ЛВ\.|BGN|€|EUR)/i);
+            if (!match) {
+                // Try without space between number and currency
+                match = text.match(/([0-9]+[.,]?[0-9]*)(лв|ЛВ|лв\.|ЛВ\.|BGN|€|EUR)/i);
+            }
             if (!match) return;
 
             var priceStr = match[1].replace(',', '.');
@@ -19,7 +23,8 @@ jQuery(function ($) {
             }
         }
 
-        $('.wc-block-components-product-price__value, .wc-block-formatted-money-amount, .wc-block-components-totals-item__value').each(function () {
+        // Target both WooCommerce Blocks and traditional WooCommerce elements
+        $('.wc-block-components-product-price__value, .wc-block-formatted-money-amount, .wc-block-components-totals-item__value, .price, .woocommerce-Price-amount').each(function () {
             appendEur($(this));
         });
 

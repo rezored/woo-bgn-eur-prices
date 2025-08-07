@@ -3,7 +3,7 @@
 /**
  * Plugin Name: Prices in BGN and EUR
  * Description: Displays prices in BGN and EUR in WooCommerce using the fixed BNB exchange rate.
- * Version: 1.4.8
+ * Version: 1.4.9
  * Author: rezored
  * Requires at least: 5.6
  * Requires PHP: 7.4
@@ -66,20 +66,45 @@ class Multi_Currency
     {
         // First try to extract price using a more specific pattern that handles both spaced and non-spaced currency symbols
         if (preg_match('/([0-9]+[.,]?[0-9]*)\s*(лв|ЛВ|лв\.|ЛВ\.|BGN|€|EUR)/i', $price_html, $matches)) {
-            $clean = str_replace(',', '.', $matches[1]);
+            $clean = self::normalize_number_format($matches[1]);
             return floatval($clean);
         }
         
         // Try pattern without space between number and currency
         if (preg_match('/([0-9]+[.,]?[0-9]*)(лв|ЛВ|лв\.|ЛВ\.|BGN|€|EUR)/i', $price_html, $matches)) {
-            $clean = str_replace(',', '.', $matches[1]);
+            $clean = self::normalize_number_format($matches[1]);
             return floatval($clean);
         }
         
         // Fallback to the original method
         $clean = preg_replace('/[^0-9.,]/', '', wp_strip_all_tags($price_html));
-        $clean = str_replace(',', '.', $clean);
+        $clean = self::normalize_number_format($clean);
         return floatval($clean);
+    }
+
+    private static function normalize_number_format($number_string)
+    {
+        // Handle different number formats more intelligently
+        $decimal_separator = wc_get_price_decimal_separator();
+        $thousand_separator = wc_get_price_thousand_separator();
+        
+        // If thousand separator is comma and decimal separator is dot
+        if ($thousand_separator === ',' && $decimal_separator === '.') {
+            // Remove thousand separators first, then ensure decimal is dot
+            $number_string = str_replace(',', '', $number_string);
+            return $number_string;
+        }
+        
+        // If thousand separator is dot and decimal separator is comma
+        if ($thousand_separator === '.' && $decimal_separator === ',') {
+            // Replace dots with empty string, then replace comma with dot
+            $number_string = str_replace('.', '', $number_string);
+            $number_string = str_replace(',', '.', $number_string);
+            return $number_string;
+        }
+        
+        // Default: just replace comma with dot (backward compatibility)
+        return str_replace(',', '.', $number_string);
     }
 
     public static function display_price_in_multiple_currencies($price_html)
@@ -130,7 +155,7 @@ class Multi_Currency
             'prices-bgn-eur-blocks',
             plugin_dir_url(__FILE__) . 'assets/css/blocks-support.css',
             [],
-            '1.4.8'
+            '1.4.9'
         );
 
         // Enqueue JavaScript
@@ -138,7 +163,7 @@ class Multi_Currency
             'prices-bgn-eur-blocks',
             plugin_dir_url(__FILE__) . 'assets/js/blocks-support.js',
             ['jquery'],
-            '1.4.8',
+            '1.4.9',
             true
         );
 
@@ -185,8 +210,8 @@ add_action('admin_menu', function () {
 <div class="wrap">
     <h1><?php esc_html_e('Prices in BGN and EUR for WooCommerce', 'prices-in-bgn-and-eur'); ?></h1>
     <p><?php esc_html_e('Thank you for using the plugin!', 'prices-in-bgn-and-eur'); ?></p>
-    <p><strong><?php esc_html_e('Version 1.4.8:', 'prices-in-bgn-and-eur'); ?></strong>
-        <?php esc_html_e('Fixed incorrect Euro conversion calculations. Improved price extraction for both traditional WooCommerce and WooCommerce Blocks elements.', 'prices-in-bgn-and-eur'); ?></p>
+    <p><strong><?php esc_html_e('Version 1.4.9:', 'prices-in-bgn-and-eur'); ?></strong>
+        <?php esc_html_e('Fixed edge case with comma handling in number formatting. Improved price extraction to handle different thousand/decimal separator configurations.', 'prices-in-bgn-and-eur'); ?></p>
     <p><?php esc_html_e('If you would like to support me, you can do so here:', 'prices-in-bgn-and-eur'); ?>
         <a href="<?php echo esc_url('https://coff.ee/rezored'); ?>" target="_blank" class="button button-primary">☕
             <?php esc_html_e('Support me', 'prices-in-bgn-and-eur'); ?></a>

@@ -4,7 +4,7 @@ Tags: woocommerce, bgn, euro, currency, prices
 Requires at least: 5.6
 Tested up to: 6.8
 Requires PHP: 7.4
-Stable tag: 1.4.8
+Stable tag: 1.4.9
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -53,6 +53,15 @@ You can send a "thank you" through the link in the plugin settings ❤️
 2. Checkout page showing both currencies
 
 == Changelog ==
+
+= 1.4.9 =
+* Fixed edge case with comma handling in number formatting
+* Improved price extraction to handle different thousand/decimal separator configurations
+* Enhanced compatibility with various WooCommerce number formatting settings
+
+= 1.4.8 =
+* Fixed incorrect Euro conversion calculations
+* Improved price extraction for both traditional WooCommerce and WooCommerce Blocks elements
 
 = 1.4.6 =
 * Fixed WordPress enqueue compliance – removed inline scripts/styles

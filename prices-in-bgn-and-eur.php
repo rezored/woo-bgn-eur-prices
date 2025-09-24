@@ -32,6 +32,17 @@ class Multi_Currency
             add_filter('woocommerce_cart_item_subtotal', [__CLASS__, 'display_price_in_multiple_currencies'], 10);
             add_filter('woocommerce_cart_subtotal', [__CLASS__, 'display_price_in_multiple_currencies'], 10);
             add_filter('woocommerce_cart_total', [__CLASS__, 'display_price_in_multiple_currencies'], 10);
+            
+            // Product page specific hooks
+            add_filter('woocommerce_get_price_html', [__CLASS__, 'display_price_in_multiple_currencies'], 10);
+            add_filter('woocommerce_product_get_price_html', [__CLASS__, 'display_price_in_multiple_currencies'], 10);
+            add_filter('woocommerce_variable_price_html', [__CLASS__, 'display_price_in_multiple_currencies'], 10);
+            add_filter('woocommerce_variation_prices_price', [__CLASS__, 'display_price_in_multiple_currencies'], 10);
+            add_filter('woocommerce_variation_prices_regular_price', [__CLASS__, 'display_price_in_multiple_currencies'], 10);
+            add_filter('woocommerce_variation_prices_sale_price', [__CLASS__, 'display_price_in_multiple_currencies'], 10);
+            
+            // Product archive/category hooks
+            add_filter('woocommerce_loop_product_price', [__CLASS__, 'display_price_in_multiple_currencies'], 10);
 
             // WooCommerce Blocks support
             add_action('wp_enqueue_scripts', [__CLASS__, 'enqueue_blocks_support_assets']);
@@ -120,6 +131,12 @@ class Multi_Currency
 
         $eur = esc_html(self::convert_to_eur($price));
         $price_html .= ' <span class="woocommerce-Price-amount amount amount-eur">(' . $eur . ' €)</span>';
+        
+        // Debug logging (remove in production)
+        if (defined('WP_DEBUG') && WP_DEBUG) {
+            error_log('BGN-EUR Plugin: Processing price - ' . $price_html);
+        }
+        
         return $price_html;
     }
 

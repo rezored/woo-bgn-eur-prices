@@ -24,7 +24,7 @@ jQuery(function ($) {
         }
 
         // Target both WooCommerce Blocks and traditional WooCommerce elements
-        $('.wc-block-components-product-price__value, .wc-block-formatted-money-amount, .wc-block-components-totals-item__value, .price, .woocommerce-Price-amount').each(function () {
+        $('.wc-block-components-product-price__value, .wc-block-formatted-money-amount, .wc-block-components-totals-item__value, .price, .woocommerce-Price-amount, .woocommerce-loop-product__title, .product .price, .woocommerce div.product p.price, .woocommerce div.product span.price, .woocommerce ul.products li.product .price').each(function () {
             appendEur($(this));
         });
 

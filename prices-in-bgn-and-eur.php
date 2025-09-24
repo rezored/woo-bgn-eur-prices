@@ -3,7 +3,7 @@
 /**
  * Plugin Name: Prices in BGN and EUR
  * Description: Displays prices in BGN and EUR in WooCommerce using the fixed BNB exchange rate.
- * Version: 1.5.0
+ * Version: 1.5.2
  * Author: rezored
  * Requires at least: 5.6
  * Requires PHP: 7.4
@@ -99,6 +99,14 @@ class Multi_Currency
         $decimal_separator = wc_get_price_decimal_separator();
         $thousand_separator = wc_get_price_thousand_separator();
         
+        // For Bulgarian format: comma is decimal separator, no thousand separator typically
+        // Check if this looks like a Bulgarian price (e.g., "269,00" or "1.234,56")
+        if (preg_match('/^[0-9]+,[0-9]{2}$/', $number_string) || 
+            preg_match('/^[0-9]+\.[0-9]{3},[0-9]{2}$/', $number_string)) {
+            // This is Bulgarian format: comma is decimal separator
+            return str_replace(',', '.', $number_string);
+        }
+        
         // If thousand separator is comma and decimal separator is dot
         if ($thousand_separator === ',' && $decimal_separator === '.') {
             // Remove thousand separators first, then ensure decimal is dot
@@ -126,6 +134,12 @@ class Multi_Currency
             return $price_html;
         }
 
+        // Check if this is a price range (contains dash or en-dash)
+        if (strpos($price_html, '–') !== false || strpos($price_html, '-') !== false) {
+            return self::handle_price_range($price_html);
+        }
+
+        // Handle single price
         $price = self::extract_numeric_price($price_html);
         if ($price <= 0) return $price_html;
 
@@ -138,6 +152,40 @@ class Multi_Currency
         }
         
         return $price_html;
+    }
+
+    private static function handle_price_range($price_html)
+    {
+        // Split the range into two parts
+        $parts = preg_split('/[–\-]/', $price_html);
+        if (count($parts) !== 2) {
+            return $price_html; // Not a valid range, return as-is
+        }
+
+        $first_part = trim($parts[0]);
+        $second_part = trim($parts[1]);
+
+        // Extract prices from both parts
+        $first_price = self::extract_numeric_price($first_part);
+        $second_price = self::extract_numeric_price($second_part);
+
+        if ($first_price <= 0 || $second_price <= 0) {
+            return $price_html; // Invalid prices, return as-is
+        }
+
+        // Convert both prices to EUR
+        $first_eur = esc_html(self::convert_to_eur($first_price));
+        $second_eur = esc_html(self::convert_to_eur($second_price));
+
+        // Reconstruct the range with EUR conversions
+        $new_price_html = $first_part . ' (' . $first_eur . ' €) – ' . $second_part . ' (' . $second_eur . ' €)';
+        
+        // Debug logging
+        if (defined('WP_DEBUG') && WP_DEBUG) {
+            error_log('BGN-EUR Plugin: Processing price range - ' . $new_price_html);
+        }
+        
+        return $new_price_html;
     }
 
     public static function add_rate_row_email($total_rows, $order)
@@ -172,7 +220,7 @@ class Multi_Currency
             'prices-bgn-eur-blocks',
             plugin_dir_url(__FILE__) . 'assets/css/blocks-support.css',
             [],
-            '1.5.0'
+            '1.5.2'
         );
 
         // Enqueue JavaScript
@@ -180,7 +228,7 @@ class Multi_Currency
             'prices-bgn-eur-blocks',
             plugin_dir_url(__FILE__) . 'assets/js/blocks-support.js',
             ['jquery'],
-            '1.5.0',
+            '1.5.2',
             true
         );
 
@@ -227,8 +275,8 @@ add_action('admin_menu', function () {
 <div class="wrap">
     <h1><?php esc_html_e('Prices in BGN and EUR for WooCommerce', 'prices-in-bgn-and-eur'); ?></h1>
     <p><?php esc_html_e('Thank you for using the plugin!', 'prices-in-bgn-and-eur'); ?></p>
-    <p><strong><?php esc_html_e('Version 1.5.0:', 'prices-in-bgn-and-eur'); ?></strong>
-        <?php esc_html_e('Fixed prices not displaying EUR on product pages and category lists. Added missing WooCommerce hooks for complete coverage.', 'prices-in-bgn-and-eur'); ?></p>
+    <p><strong><?php esc_html_e('Version 1.5.2:', 'prices-in-bgn-and-eur'); ?></strong>
+        <?php esc_html_e('FIXED: Price ranges now properly convert both prices. "269,00 лв – 559,00 лв" now shows both EUR conversions correctly.', 'prices-in-bgn-and-eur'); ?></p>
     <p><?php esc_html_e('If you would like to support me, you can do so here:', 'prices-in-bgn-and-eur'); ?>
         <a href="<?php echo esc_url('https://coff.ee/rezored'); ?>" target="_blank" class="button button-primary">☕
             <?php esc_html_e('Support me', 'prices-in-bgn-and-eur'); ?></a>

@@ -4,11 +4,11 @@ Tags: woocommerce, bgn, euro, currency, prices
 Requires at least: 5.6
 Tested up to: 6.8
 Requires PHP: 7.4
-Stable tag: 1.5.0
+Stable tag: 1.5.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Display WooCommerce prices in BGN and EUR using the fixed BNB exchange rate (1 EUR = 1.95583 BGN). Compliant with the new Bulgarian law effective 1 August 2025.
+Display WooCommerce prices in BGN and EUR using the fixed BNB exchange rate. Compliant with Bulgarian law from 1 August 2025.
 
 == Description ==
 
@@ -53,6 +53,12 @@ You can send a "thank you" through the link in the plugin settings ❤️
 2. Checkout page showing both currencies
 
 == Changelog ==
+
+= 1.5.1 =
+* CRITICAL FIX: Fixed incorrect price extraction for Bulgarian number format
+* Fixed prices like "269,00 лв" being converted to massive amounts
+* Improved price range handling (e.g., "269,00 лв – 559,00 лв")
+* Enhanced Bulgarian decimal separator recognition
 
 = 1.5.0 =
 * Fixed prices not displaying EUR on product pages and category lists

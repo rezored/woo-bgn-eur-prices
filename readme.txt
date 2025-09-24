@@ -4,7 +4,7 @@ Tags: woocommerce, bgn, euro, currency, prices
 Requires at least: 5.6
 Tested up to: 6.8
 Requires PHP: 7.4
-Stable tag: 1.4.9
+Stable tag: 1.5.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -53,6 +53,12 @@ You can send a "thank you" through the link in the plugin settings ❤️
 2. Checkout page showing both currencies
 
 == Changelog ==
+
+= 1.5.0 =
+* Fixed prices not displaying EUR on product pages and category lists
+* Added missing WooCommerce hooks for complete price coverage
+* Enhanced JavaScript selectors for better product page targeting
+* Added debug logging for troubleshooting
 
 = 1.4.9 =
 * Fixed edge case with comma handling in number formatting

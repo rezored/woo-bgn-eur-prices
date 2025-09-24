@@ -3,7 +3,7 @@
 /**
  * Plugin Name: Prices in BGN and EUR
  * Description: Displays prices in BGN and EUR in WooCommerce using the fixed BNB exchange rate.
- * Version: 1.4.9
+ * Version: 1.5.0
  * Author: rezored
  * Requires at least: 5.6
  * Requires PHP: 7.4
@@ -172,7 +172,7 @@ class Multi_Currency
             'prices-bgn-eur-blocks',
             plugin_dir_url(__FILE__) . 'assets/css/blocks-support.css',
             [],
-            '1.4.9'
+            '1.5.0'
         );
 
         // Enqueue JavaScript
@@ -180,7 +180,7 @@ class Multi_Currency
             'prices-bgn-eur-blocks',
             plugin_dir_url(__FILE__) . 'assets/js/blocks-support.js',
             ['jquery'],
-            '1.4.9',
+            '1.5.0',
             true
         );
 
@@ -227,8 +227,8 @@ add_action('admin_menu', function () {
 <div class="wrap">
     <h1><?php esc_html_e('Prices in BGN and EUR for WooCommerce', 'prices-in-bgn-and-eur'); ?></h1>
     <p><?php esc_html_e('Thank you for using the plugin!', 'prices-in-bgn-and-eur'); ?></p>
-    <p><strong><?php esc_html_e('Version 1.4.9:', 'prices-in-bgn-and-eur'); ?></strong>
-        <?php esc_html_e('Fixed edge case with comma handling in number formatting. Improved price extraction to handle different thousand/decimal separator configurations.', 'prices-in-bgn-and-eur'); ?></p>
+    <p><strong><?php esc_html_e('Version 1.5.0:', 'prices-in-bgn-and-eur'); ?></strong>
+        <?php esc_html_e('Fixed prices not displaying EUR on product pages and category lists. Added missing WooCommerce hooks for complete coverage.', 'prices-in-bgn-and-eur'); ?></p>
     <p><?php esc_html_e('If you would like to support me, you can do so here:', 'prices-in-bgn-and-eur'); ?>
         <a href="<?php echo esc_url('https://coff.ee/rezored'); ?>" target="_blank" class="button button-primary">☕
             <?php esc_html_e('Support me', 'prices-in-bgn-and-eur'); ?></a>

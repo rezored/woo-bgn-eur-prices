@@ -4,7 +4,7 @@ Tags: woocommerce, bgn, euro, currency, prices
 Requires at least: 5.6
 Tested up to: 6.8
 Requires PHP: 7.4
-Stable tag: 1.5.1
+Stable tag: 1.5.2
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -53,6 +53,11 @@ You can send a "thank you" through the link in the plugin settings ❤️
 2. Checkout page showing both currencies
 
 == Changelog ==
+
+= 1.5.2 =
+* FIXED: Price ranges now properly convert both prices
+* "269,00 лв – 559,00 лв" now shows both EUR conversions correctly
+* Enhanced range splitting logic for better price range handling
 
 = 1.5.1 =
 * CRITICAL FIX: Fixed incorrect price extraction for Bulgarian number format

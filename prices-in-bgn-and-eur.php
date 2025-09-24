@@ -1,9 +1,8 @@
 <?php
-
 /**
  * Plugin Name: Prices in BGN and EUR
- * Description: Displays prices in BGN and EUR in WooCommerce using the fixed BNB exchange rate.
- * Version: 1.4.9
+ * Description: Displays prices in BGN and EUR in WooCommerce using the fixed BNB exchange rate (appends EUR once per number).
+ * Version: 1.6.0
  * Author: rezored
  * Requires at least: 5.6
  * Requires PHP: 7.4
@@ -21,19 +20,19 @@ class Multi_Currency
     public function __construct()
     {
         if (!\is_admin()) {
-            // Traditional WooCommerce hooks
+            /**
+             * IMPORTANT:
+             * We only hook into wc_price so each numeric price gets EUR once.
+             * (HTML-level hooks like woocommerce_get_price_html would cause duplication.)
+             */
             add_filter('wc_price', [__CLASS__, 'display_price_in_multiple_currencies'], 10);
+
+            // Emails / totals note
             add_filter('woocommerce_get_order_item_totals', [__CLASS__, 'add_rate_row_email'], 10, 2);
             add_action('woocommerce_cart_totals_after_order_total', [__CLASS__, 'show_cart_total_in_eur_and_note']);
             add_action('woocommerce_review_order_after_order_total', [__CLASS__, 'show_cart_total_in_eur_and_note']);
 
-            // Additional hooks for better coverage
-            add_filter('woocommerce_cart_item_price', [__CLASS__, 'display_price_in_multiple_currencies'], 10);
-            add_filter('woocommerce_cart_item_subtotal', [__CLASS__, 'display_price_in_multiple_currencies'], 10);
-            add_filter('woocommerce_cart_subtotal', [__CLASS__, 'display_price_in_multiple_currencies'], 10);
-            add_filter('woocommerce_cart_total', [__CLASS__, 'display_price_in_multiple_currencies'], 10);
-
-            // WooCommerce Blocks support
+            // WooCommerce Blocks support (just CSS/JS, no duplication)
             add_action('wp_enqueue_scripts', [__CLASS__, 'enqueue_blocks_support_assets']);
         }
     }
@@ -49,39 +48,20 @@ class Multi_Currency
         return number_format($eur, 2, wc_get_price_decimal_separator(), wc_get_price_thousand_separator());
     }
 
-    // Debug method to test conversion
-    public static function debug_conversion($bgn)
-    {
-        $rate = self::get_eur_rate();
-        $eur = floatval($bgn) / $rate;
-        return [
-            'bgn' => $bgn,
-            'rate' => $rate,
-            'eur' => $eur,
-            'formatted' => number_format($eur, 2, '.', ',')
-        ];
-    }
-
     private static function extract_numeric_price($price_html)
     {
         // Debug logging
         if (defined('WP_DEBUG') && WP_DEBUG) {
             error_log('BGN-EUR Plugin: Extracting from - ' . $price_html);
         }
-        
-        // First try to extract price using a more specific pattern that handles both spaced and non-spaced currency symbols
-        if (preg_match('/([0-9]+[.,]?[0-9]*)\s*(лв|ЛВ|лв\.|ЛВ\.|BGN|€|EUR)/i', $price_html, $matches)) {
-            $clean = self::normalize_number_format($matches[1]);
+
+        // Try to grab a number next to a currency
+        if (preg_match('/([0-9]+[.,]?[0-9]*)\s*(лв|ЛВ|лв\.|ЛВ\.|BGN|€|EUR)/i', $price_html, $m)) {
+            $clean = self::normalize_number_format($m[1]);
             return floatval($clean);
         }
-        
-        // Try pattern without space between number and currency
-        if (preg_match('/([0-9]+[.,]?[0-9]*)(лв|ЛВ|лв\.|ЛВ\.|BGN|€|EUR)/i', $price_html, $matches)) {
-            $clean = self::normalize_number_format($matches[1]);
-            return floatval($clean);
-        }
-        
-        // Fallback to the original method
+
+        // Fallback: strip everything but digits and separators
         $clean = preg_replace('/[^0-9.,]/', '', wp_strip_all_tags($price_html));
         $clean = self::normalize_number_format($clean);
         return floatval($clean);
@@ -89,26 +69,19 @@ class Multi_Currency
 
     private static function normalize_number_format($number_string)
     {
-        // Handle different number formats more intelligently
-        $decimal_separator = wc_get_price_decimal_separator();
+        $decimal_separator  = wc_get_price_decimal_separator();
         $thousand_separator = wc_get_price_thousand_separator();
-        
-        // If thousand separator is comma and decimal separator is dot
+
         if ($thousand_separator === ',' && $decimal_separator === '.') {
-            // Remove thousand separators first, then ensure decimal is dot
-            $number_string = str_replace(',', '', $number_string);
-            return $number_string;
+            return str_replace(',', '', $number_string); // remove thousands, keep dot decimals
         }
-        
-        // If thousand separator is dot and decimal separator is comma
+
         if ($thousand_separator === '.' && $decimal_separator === ',') {
-            // Replace dots with empty string, then replace comma with dot
-            $number_string = str_replace('.', '', $number_string);
-            $number_string = str_replace(',', '.', $number_string);
-            return $number_string;
+            $number_string = str_replace('.', '', $number_string); // remove thousands
+            return str_replace(',', '.', $number_string);          // make decimals dot
         }
-        
-        // Default: just replace comma with dot (backward compatibility)
+
+        // Default
         return str_replace(',', '.', $number_string);
     }
 
@@ -116,101 +89,23 @@ class Multi_Currency
     {
         $current_currency = get_woocommerce_currency();
 
-        if (strpos($price_html, 'amount-eur') !== false || $current_currency !== 'BGN') {
+        // Safety guards: only for BGN and only once
+        if (
+            $current_currency !== 'BGN' ||
+            strpos($price_html, 'amount-eur') !== false || // our own marker
+            strpos($price_html, '€') !== false             // already has EUR somewhere
+        ) {
             return $price_html;
         }
 
-        // Check if this is a price range (contains dash or en-dash)
-        if (strpos($price_html, '–') !== false || strpos($price_html, '-') !== false) {
-            return self::handle_price_range($price_html);
+        // Extract numeric and append one EUR per formatted number
+        $price = self::extract_numeric_price($price_html);
+        if ($price <= 0) {
+            return $price_html;
         }
-
-        // Handle single price
-        $price = self::extract_clean_price($price_html);
-        if ($price <= 0) return $price_html;
 
         $eur = esc_html(self::convert_to_eur($price));
-        // Check if EUR is already present to avoid duplication
-        if (strpos($price_html, '€') === false) {
-            $price_html .= ' <span class="woocommerce-Price-amount amount amount-eur">(' . $eur . ' €)</span>';
-        }
-        
-        return $price_html;
-    }
-
-    // Debug function to show debug info on frontend
-    public static function debug_price_extraction($price_html)
-    {
-        $debug_info = [];
-        $debug_info[] = "Original HTML: " . htmlspecialchars($price_html);
-        
-        // Test extraction
-        $price = self::extract_numeric_price($price_html);
-        $debug_info[] = "Extracted price: " . $price;
-        
-        // Test conversion
-        $eur = self::convert_to_eur($price);
-        $debug_info[] = "EUR conversion: " . $eur;
-        
-        return '<div style="background: #f0f0f0; padding: 10px; margin: 10px 0; border: 1px solid #ccc; font-family: monospace; font-size: 12px;">' . 
-               '<strong>DEBUG INFO:</strong><br>' . 
-               implode('<br>', $debug_info) . 
-               '</div>';
-    }
-
-    private static function handle_price_range($price_html)
-    {
-        // Split the range into two parts using both dash types
-        $parts = preg_split('/[–\-]/', $price_html);
-        if (count($parts) !== 2) {
-            return $price_html; // Not a valid range, return as-is
-        }
-
-        $first_part = trim($parts[0]);
-        $second_part = trim($parts[1]);
-
-        // Process each part individually to get clean prices
-        $first_clean_price = self::extract_clean_price($first_part);
-        $second_clean_price = self::extract_clean_price($second_part);
-
-        if ($first_clean_price <= 0 || $second_clean_price <= 0) {
-            return $price_html; // Invalid prices, return as-is
-        }
-
-        // Convert both prices to EUR
-        $first_eur = esc_html(self::convert_to_eur($first_clean_price));
-        $second_eur = esc_html(self::convert_to_eur($second_clean_price));
-
-        // Reconstruct the range with EUR conversions
-        $new_price_html = $first_part . ' (' . $first_eur . ' €) – ' . $second_part . ' (' . $second_eur . ' €)';
-        
-        return $new_price_html;
-    }
-
-    private static function extract_clean_price($price_text)
-    {
-        // Remove HTML tags and get clean text
-        $clean_text = wp_strip_all_tags($price_text);
-        
-        // Look for Bulgarian price pattern: number,comma,number followed by currency
-        if (preg_match('/([0-9]+,[0-9]{2})\s*(лв|ЛВ|лв\.|ЛВ\.|BGN)/i', $clean_text, $matches)) {
-            // This is Bulgarian format: comma is decimal separator
-            $price_str = str_replace(',', '.', $matches[1]);
-            return floatval($price_str);
-        }
-        
-        // Fallback: try to extract any number with comma
-        if (preg_match('/([0-9]+,[0-9]+)/', $clean_text, $matches)) {
-            $price_str = str_replace(',', '.', $matches[1]);
-            return floatval($price_str);
-        }
-        
-        // Final fallback: extract any number
-        if (preg_match('/([0-9]+)/', $clean_text, $matches)) {
-            return floatval($matches[1]);
-        }
-        
-        return 0;
+        return $price_html . ' <span class="woocommerce-Price-amount amount amount-eur">(' . $eur . ' €)</span>';
     }
 
     public static function add_rate_row_email($total_rows, $order)
@@ -238,14 +133,14 @@ class Multi_Currency
     {
         if (get_woocommerce_currency() !== 'BGN') return;
 
-        if (!is_cart() && !is_checkout() && !is_shop() && !is_product()) return;
+        if (!is_cart() && !is_checkout() && !is_shop() && !is_product() && !is_product_category() && !is_product_tag()) return;
 
         // Enqueue CSS
         wp_enqueue_style(
             'prices-bgn-eur-blocks',
             plugin_dir_url(__FILE__) . 'assets/css/blocks-support.css',
             [],
-            '1.4.9'
+            '1.6.0'
         );
 
         // Enqueue JavaScript
@@ -253,7 +148,7 @@ class Multi_Currency
             'prices-bgn-eur-blocks',
             plugin_dir_url(__FILE__) . 'assets/js/blocks-support.js',
             ['jquery'],
-            '1.4.9',
+            '1.6.0',
             true
         );
 
@@ -262,9 +157,9 @@ class Multi_Currency
             'prices-bgn-eur-blocks',
             'pricesBgnEurData',
             [
-                'eurRate' => self::get_eur_rate(),
+                'eurRate'        => self::get_eur_rate(),
                 'disclaimerText' => __('Сумата в евро се получава чрез конвертиране на цената по фиксирания обменен курс на БНБ:', 'prices-in-bgn-and-eur'),
-                'rateText' => '1 EUR = 1.95583 BGN'
+                'rateText'       => '1 EUR = 1.95583 BGN'
             ]
         );
     }
@@ -273,12 +168,12 @@ class Multi_Currency
 // Initialize
 new \Prices_BGN_EUR\Front_End\Multi_Currency();
 
+/**
+ * Admin: plugin row icon
+ */
 add_action('admin_head', function () {
-    // Replace 'prices-in-bgn-and-eur' with your plugin's folder slug
     $plugin_slug = 'prices-in-bgn-and-eur';
-
-    // URL to your custom icon
-    $icon_url = plugin_dir_url(__FILE__) . 'assets/icon_new.png';
+    $icon_url    = plugin_dir_url(__FILE__) . 'assets/icon_new.png';
 
     echo '<style>
         tr[data-slug="' . esc_attr($plugin_slug) . '"] .plugin-icon {
@@ -289,7 +184,9 @@ add_action('admin_head', function () {
     </style>';
 });
 
-// Admin menu & settings page
+/**
+ * (Optional) Settings page shell
+ */
 add_action('admin_menu', function () {
     add_options_page(
         'Prices in BGN and EUR',
@@ -297,19 +194,19 @@ add_action('admin_menu', function () {
         'manage_options',
         'prices-bgn-eur-settings',
         function () { ?>
-<div class="wrap">
-    <h1><?php esc_html_e('Prices in BGN and EUR for WooCommerce', 'prices-in-bgn-and-eur'); ?></h1>
-    <p><?php esc_html_e('Thank you for using the plugin!', 'prices-in-bgn-and-eur'); ?></p>
-    <p><strong><?php esc_html_e('Version 1.4.9:', 'prices-in-bgn-and-eur'); ?></strong>
-        <?php esc_html_e('Fixed edge case with comma handling in number formatting. Improved price extraction to handle different thousand/decimal separator configurations.', 'prices-in-bgn-and-eur'); ?></p>
-    <p><?php esc_html_e('If you would like to support me, you can do so here:', 'prices-in-bgn-and-eur'); ?>
-        <a href="<?php echo esc_url('https://coff.ee/rezored'); ?>" target="_blank" class="button button-primary">☕
-            <?php esc_html_e('Support me', 'prices-in-bgn-and-eur'); ?></a>
-    </p>
-    <hr>
-    <h2><?php esc_html_e('Settings (in the future)', 'prices-in-bgn-and-eur'); ?></h2>
-    <p><?php esc_html_e('Expect settings for display, formats and more.', 'prices-in-bgn-and-eur'); ?></p>
-</div>
-<?php }
+            <div class="wrap">
+                <h1><?php esc_html_e('Prices in BGN and EUR for WooCommerce', 'prices-in-bgn-and-eur'); ?></h1>
+                <p><?php esc_html_e('Thank you for using the plugin!', 'prices-in-bgn-and-eur'); ?></p>
+                <p><strong><?php esc_html_e('Version 1.6.0:', 'prices-in-bgn-and-eur'); ?></strong>
+                    <?php esc_html_e('Fix: removed HTML-level price hooks to prevent duplicate EUR on ranges and single prices.', 'prices-in-bgn-and-eur'); ?></p>
+                <p><?php esc_html_e('If you would like to support me, you can do so here:', 'prices-in-bgn-and-eur'); ?>
+                    <a href="<?php echo esc_url('https://coff.ee/rezored'); ?>" target="_blank" class="button button-primary">☕
+                        <?php esc_html_e('Support me', 'prices-in-bgn-and-eur'); ?></a>
+                </p>
+                <hr>
+                <h2><?php esc_html_e('Settings (in the future)', 'prices-in-bgn-and-eur'); ?></h2>
+                <p><?php esc_html_e('Expect settings for display, formats and more.', 'prices-in-bgn-and-eur'); ?></p>
+            </div>
+        <?php }
     );
 });

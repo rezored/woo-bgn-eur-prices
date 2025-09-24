@@ -3,7 +3,11 @@ jQuery(function ($) {
         var eurRate = pricesBgnEurData.eurRate;
 
         function appendEur($el) {
-            if ($el.find('.amount-eur').length || $el.text().includes('€')) return;
+            // More strict checking to prevent double processing
+            if ($el.find('.amount-eur').length || $el.text().includes('€') || $el.html().includes('amount-eur')) return;
+
+            // Check if this element is inside a price element that already has EUR
+            if ($el.closest('.price').find('.amount-eur').length > 0) return;
 
             // Improved price extraction - look for numbers followed by currency symbols
             var text = $el.text();
@@ -23,8 +27,8 @@ jQuery(function ($) {
             }
         }
 
-        // Target both WooCommerce Blocks and traditional WooCommerce elements
-        $('.wc-block-components-product-price__value, .wc-block-formatted-money-amount, .wc-block-components-totals-item__value, .price, .woocommerce-Price-amount, .woocommerce-loop-product__title, .product .price, .woocommerce div.product p.price, .woocommerce div.product span.price, .woocommerce ul.products li.product .price').each(function () {
+        // Target only WooCommerce Blocks elements that PHP doesn't handle
+        $('.wc-block-components-product-price__value, .wc-block-formatted-money-amount, .wc-block-components-totals-item__value').each(function () {
             appendEur($(this));
         });
 

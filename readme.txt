@@ -4,7 +4,7 @@ Tags: woocommerce, bgn, euro, currency, prices
 Requires at least: 5.6
 Tested up to: 6.8
 Requires PHP: 7.4
-Stable tag: 1.4.9
+Stable tag: 1.6.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -53,6 +53,29 @@ You can send a "thank you" through the link in the plugin settings ❤️
 2. Checkout page showing both currencies
 
 == Changelog ==
+
+= 1.6.0 =
+* CRITICAL FIX for duplicate EUR prices - Resolved problem with duplicate EUR prices
+* Simplified architecture - Uses only wc_price hook to prevent duplication
+* Removed HTML-level hooks that were causing duplication on price ranges
+* Cleaner logic - One EUR per numeric price, no duplication
+
+= 1.5.5 =
+* Fixed double EUR price issue - Resolved problem with duplicate EUR prices
+* Improved detection logic - More strict checking to prevent duplication
+* Optimized processing - More efficient price processing logic
+
+= 1.5.4 =
+* CRITICAL FIX for WooCommerce 10.1.2 - Resolved missing EUR prices on product pages
+* Added specific hooks for WooCommerce 10.1.2+ compatibility
+* Added direct action hooks for more reliable product page coverage
+* Enhanced debug logging for easier troubleshooting
+
+= 1.5.3 =
+* Fixed missing EUR prices on product pages and category listings
+* Added missing WooCommerce hooks for complete product page coverage
+* Enhanced JavaScript selectors for better product page targeting
+* Added debug logging for easier troubleshooting
 
 = 1.4.9 =
 * Fixed edge case with comma handling in number formatting

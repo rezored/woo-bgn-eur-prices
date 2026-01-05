@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Prices in BGN and EUR
  * Description: Displays prices in BGN and EUR in WooCommerce using the fixed BNB exchange rate (appends EUR once per number).
- * Version: 1.7.0
+ * Version: 1.7.1
  * Author: rezored
  * Requires at least: 5.6
  * Requires PHP: 7.4
@@ -172,10 +172,10 @@ class Multi_Currency
         if (!is_cart() && !is_checkout() && !is_shop() && !is_product() && !is_product_category() && !is_product_tag()) return;
 
         // Enqueue CSS
-        wp_enqueue_style('prices-bgn-eur-blocks', plugin_dir_url(__FILE__) . 'assets/css/blocks-support.css', [], '1.7.0');
+        wp_enqueue_style('prices-bgn-eur-blocks', plugin_dir_url(__FILE__) . 'assets/css/blocks-support.css', [], '1.7.1');
 
         // Enqueue JavaScript
-        wp_enqueue_script('prices-bgn-eur-blocks', plugin_dir_url(__FILE__) . 'assets/js/blocks-support.js', ['jquery'], '1.7.0', true);
+        wp_enqueue_script('prices-bgn-eur-blocks', plugin_dir_url(__FILE__) . 'assets/js/blocks-support.js', ['jquery'], '1.7.1', true);
 
         // Localize
         wp_localize_script(
@@ -208,6 +208,19 @@ add_action('admin_head', function () {
             background-position: center !important;
         }
     </style>';
+});
+
+/**
+ * Admin: Add setup/support links to plugins page
+ */
+add_filter('plugin_action_links_prices-in-bgn-and-eur/prices-in-bgn-and-eur.php', function ($links) {
+    $settings_link = '<a href="options-general.php?page=prices-bgn-eur-settings">' . __('Settings', 'prices-in-bgn-and-eur') . '</a>';
+    $support_link  = '<a href="https://coff.ee/rezored" target="_blank" style="color:#d63638;font-weight:bold;">☕ ' . __('Support me', 'prices-in-bgn-and-eur') . '</a>';
+    
+    array_unshift($links, $settings_link);
+    $links[] = $support_link;
+    
+    return $links;
 });
 
 /**

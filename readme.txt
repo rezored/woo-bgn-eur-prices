@@ -1,12 +1,14 @@
 === Prices in BGN and EUR ===
 Contributors: rezored
 Tags: woocommerce, bgn, euro, currency, prices
+Plugin URI: https://wordpress.org/plugins/prices-in-bgn-and-eur/
 Requires at least: 5.6
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 1.7.0
+Stable tag: 1.7.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
+Donate link: https://coff.ee/rezored
 
 Display WooCommerce prices in BGN and EUR using the fixed BNB exchange rate. Compliant with Bulgarian law from 1 August 2025.
 
@@ -28,6 +30,11 @@ This lightweight plugin automatically adds the secondary price display alongside
 - Mini cart
 - Order emails
 
+== Support ==
+
+If you find this plugin useful, please consider buying me a coffee to support the development!
+https://coff.ee/rezored
+
 == Features ==
 - ✅ Automatic EUR price calculation from BGN  
 - ✅ Uses fixed BNB exchange rate: 1 EUR = 1.95583 BGN  
@@ -44,7 +51,7 @@ This lightweight plugin automatically adds the secondary price display alongside
 == Frequently Asked Questions ==
 
 = Will it work with currencies other than BGN? =
-No. This plugin is designed only for stores with BGN as the primary currency.
+Yes! As of version 1.7.0, the plugin supports both BGN and EUR stores. If your store is in BGN, it shows EUR prices. If your store is in EUR, it shows BGN prices.
 
 = Can I change the exchange rate? =
 No. The rate is fixed by law. For dynamic rates, use a multi-currency plugin.
@@ -58,6 +65,12 @@ You can send a "thank you" through the link in the plugin settings ❤️
 2. Checkout page showing both currencies
 
 == Changelog ==
+
+= 1.7.1 =
+* Tested up to WordPress 6.9
+* Refined EUR to BGN support (Bidirectional)
+* Added "Support me" link in Plugins list
+* Added Donate link for WordPress directory
 
 = 1.6.0 =
 * CRITICAL FIX for duplicate EUR prices - Resolved problem with duplicate EUR prices

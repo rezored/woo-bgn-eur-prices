@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Prices in BGN and EUR
  * Description: Displays prices in BGN and EUR in WooCommerce using the fixed BNB exchange rate (appends EUR once per number).
- * Version: 1.6.0
+ * Version: 1.7.0
  * Author: rezored
  * Requires at least: 5.6
  * Requires PHP: 7.4
@@ -37,15 +37,20 @@ class Multi_Currency
         }
     }
 
-    public static function get_eur_rate()
+    public static function get_rate()
     {
         return apply_filters('prices_bgn_eur_rate', 1.95583);
     }
 
-    public static function convert_to_eur($bgn)
+    public static function convert_price($amount, $from_currency)
     {
-        $eur = floatval($bgn) / self::get_eur_rate();
-        return number_format($eur, 2, wc_get_price_decimal_separator(), wc_get_price_thousand_separator());
+        $rate = self::get_rate();
+        if ($from_currency === 'BGN') {
+            return floatval($amount) / $rate; // Convert to EUR
+        } elseif ($from_currency === 'EUR') {
+            return floatval($amount) * $rate; // Convert to BGN
+        }
+        return $amount;
     }
 
     private static function extract_numeric_price($price_html)
@@ -87,25 +92,52 @@ class Multi_Currency
 
     public static function display_price_in_multiple_currencies($price_html)
     {
+        // Check if plugin is active in settings (default true)
+        if (get_option('prices_bgn_eur_active', 'yes') !== 'yes') {
+            return $price_html;
+        }
+
         $current_currency = get_woocommerce_currency();
 
-        // Safety guards: only for BGN and only once
+        // Only support BGN and EUR
+        if (!in_array($current_currency, ['BGN', 'EUR'])) {
+            return $price_html;
+        }
+
+        // Avoid infinite loops or double formatting
         if (
-            $current_currency !== 'BGN' ||
-            strpos($price_html, 'amount-eur') !== false || // our own marker
-            strpos($price_html, '€') !== false             // already has EUR somewhere
+            strpos($price_html, 'amount-secondary') !== false || 
+            ($current_currency === 'BGN' && strpos($price_html, '€') !== false) ||
+            ($current_currency === 'EUR' && (strpos($price_html, 'лв') !== false || strpos($price_html, 'BGN') !== false))
         ) {
             return $price_html;
         }
 
-        // Extract numeric and append one EUR per formatted number
+        // Extract numeric
         $price = self::extract_numeric_price($price_html);
         if ($price <= 0) {
             return $price_html;
         }
 
-        $eur = esc_html(self::convert_to_eur($price));
-        return $price_html . ' <span class="woocommerce-Price-amount amount amount-eur">(' . $eur . ' €)</span>';
+        $converted_amount = self::convert_price($price, $current_currency);
+        
+        $formatted_converted = number_format(
+            $converted_amount, 
+            wc_get_price_decimals(), 
+            wc_get_price_decimal_separator(), 
+            wc_get_price_thousand_separator()
+        );
+
+        // Determine symbols
+        if ($current_currency === 'BGN') {
+            $secondary_display = $formatted_converted . ' €';
+        } else {
+            // Base is EUR, show BGN
+            $secondary_display = $formatted_converted . ' лв.'; 
+        }
+
+        // Simple Output: Main Price (Secondary Price)
+        return $price_html . ' <span class="amount-secondary" style="font-size:0.9em;color:#777;margin-left:5px;">(' . $secondary_display . ')</span>';
     }
 
     public static function add_rate_row_email($total_rows, $order)
@@ -131,34 +163,28 @@ class Multi_Currency
 
     public static function enqueue_blocks_support_assets()
     {
-        if (get_woocommerce_currency() !== 'BGN') return;
+        if (get_option('prices_bgn_eur_active', 'yes') !== 'yes') return;
 
+        $currency = get_woocommerce_currency();
+        if (!in_array($currency, ['BGN', 'EUR'])) return;
+
+        // Conditionals for pages...
         if (!is_cart() && !is_checkout() && !is_shop() && !is_product() && !is_product_category() && !is_product_tag()) return;
 
         // Enqueue CSS
-        wp_enqueue_style(
-            'prices-bgn-eur-blocks',
-            plugin_dir_url(__FILE__) . 'assets/css/blocks-support.css',
-            [],
-            '1.6.0'
-        );
+        wp_enqueue_style('prices-bgn-eur-blocks', plugin_dir_url(__FILE__) . 'assets/css/blocks-support.css', [], '1.7.0');
 
         // Enqueue JavaScript
-        wp_enqueue_script(
-            'prices-bgn-eur-blocks',
-            plugin_dir_url(__FILE__) . 'assets/js/blocks-support.js',
-            ['jquery'],
-            '1.6.0',
-            true
-        );
+        wp_enqueue_script('prices-bgn-eur-blocks', plugin_dir_url(__FILE__) . 'assets/js/blocks-support.js', ['jquery'], '1.7.0', true);
 
-        // Localize script with data
+        // Localize
         wp_localize_script(
             'prices-bgn-eur-blocks',
             'pricesBgnEurData',
             [
-                'eurRate'        => self::get_eur_rate(),
-                'disclaimerText' => __('Сумата в евро се получава чрез конвертиране на цената по фиксирания обменен курс на БНБ:', 'prices-in-bgn-and-eur'),
+                'rate'           => self::get_rate(),
+                'currency'       => $currency,
+                'disclaimerText' => __('Цените се изчисляват по фиксирания курс на БНБ:', 'prices-in-bgn-and-eur'),
                 'rateText'       => '1 EUR = 1.95583 BGN'
             ]
         );
@@ -187,26 +213,56 @@ add_action('admin_head', function () {
 /**
  * (Optional) Settings page shell
  */
+// Register Setting
+add_action('admin_init', function() {
+    register_setting('prices_bgn_eur_options', 'prices_bgn_eur_active');
+});
+
+/**
+ * Admin: Settings Page
+ */
 add_action('admin_menu', function () {
     add_options_page(
         'Prices in BGN and EUR',
         'Prices in BGN and EUR',
         'manage_options',
         'prices-bgn-eur-settings',
-        function () { ?>
+        function () { 
+            ?>
             <div class="wrap">
-                <h1><?php esc_html_e('Prices in BGN and EUR for WooCommerce', 'prices-in-bgn-and-eur'); ?></h1>
-                <p><?php esc_html_e('Thank you for using the plugin!', 'prices-in-bgn-and-eur'); ?></p>
-                <p><strong><?php esc_html_e('Version 1.6.0:', 'prices-in-bgn-and-eur'); ?></strong>
-                    <?php esc_html_e('Fix: removed HTML-level price hooks to prevent duplicate EUR on ranges and single prices.', 'prices-in-bgn-and-eur'); ?></p>
-                <p><?php esc_html_e('If you would like to support me, you can do so here:', 'prices-in-bgn-and-eur'); ?>
-                    <a href="<?php echo esc_url('https://coff.ee/rezored'); ?>" target="_blank" class="button button-primary">☕
-                        <?php esc_html_e('Support me', 'prices-in-bgn-and-eur'); ?></a>
-                </p>
+                <h1><?php esc_html_e('Prices in BGN and EUR', 'prices-in-bgn-and-eur'); ?></h1>
+                
+                <form method="post" action="options.php">
+                    <?php settings_fields('prices_bgn_eur_options'); ?>
+                    <?php do_settings_sections('prices_bgn_eur_options'); ?>
+                    
+                    <table class="form-table">
+                        <tr valign="top">
+                            <th scope="row"><?php esc_html_e('Enable Dual Currency Display', 'prices-in-bgn-and-eur'); ?></th>
+                            <td>
+                                <input type="checkbox" name="prices_bgn_eur_active" value="yes" <?php checked(get_option('prices_bgn_eur_active', 'yes'), 'yes'); ?> />
+                                <p class="description"><?php esc_html_e('If unchecked, the plugin will not modify any prices.', 'prices-in-bgn-and-eur'); ?></p>
+                            </td>
+                        </tr>
+                    </table>
+                    
+                    <?php submit_button(); ?>
+                </form>
+
                 <hr>
-                <h2><?php esc_html_e('Settings (in the future)', 'prices-in-bgn-and-eur'); ?></h2>
-                <p><?php esc_html_e('Expect settings for display, formats and more.', 'prices-in-bgn-and-eur'); ?></p>
+                
+                <h3><?php esc_html_e('Information', 'prices-in-bgn-and-eur'); ?></h3>
+                <p>
+                    <?php esc_html_e('This plugin automatically detects your WooCommerce currency.', 'prices-in-bgn-and-eur'); ?><br>
+                    <strong><?php esc_html_e('If your currency is BGN:', 'prices-in-bgn-and-eur'); ?></strong> <?php esc_html_e('It will display ~ EUR prices (divide by 1.95583).', 'prices-in-bgn-and-eur'); ?><br>
+                    <strong><?php esc_html_e('If your currency is EUR:', 'prices-in-bgn-and-eur'); ?></strong> <?php esc_html_e('It will display ~ BGN prices (multiply by 1.95583).', 'prices-in-bgn-and-eur'); ?>
+                </p>
+
+                <p>
+                    <a href="<?php echo esc_url('https://coff.ee/rezored'); ?>" target="_blank" class="button">☕ <?php esc_html_e('Support the developer', 'prices-in-bgn-and-eur'); ?></a>
+                </p>
             </div>
-        <?php }
+            <?php 
+        }
     );
 });

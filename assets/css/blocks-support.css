@@ -1,10 +1,13 @@
-.amount-eur { 
-    color: #666; 
-    font-size: 0.9em; 
-    font-weight: normal; 
+/* Basic styling for the secondary currency display */
+.amount-secondary {
+    color: #777;
+    font-size: 0.9em;
+    font-weight: normal;
+    white-space: nowrap;
 }
 
-.wc-block-components-product-price__value .amount-eur,
-.wc-block-formatted-money-amount .amount-eur { 
-    margin-left: 5px; 
-} 
+/* Ensure no conflicts with block themes */
+.wc-block-components-product-price__value .amount-secondary,
+.wc-block-formatted-money-amount .amount-secondary {
+    margin-left: 0.5em;
+}

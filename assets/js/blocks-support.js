@@ -1,37 +1,54 @@
 jQuery(function ($) {
-    function addEurToBlocks() {
-        var eurRate = pricesBgnEurData.eurRate;
+    function addSecondaryCurrencyToBlocks() {
+        var rate = pricesBgnEurData.rate;
+        var currency = pricesBgnEurData.currency; // 'BGN' or 'EUR'
 
-        function appendEur($el) {
-            // More strict checking to prevent double processing
-            if ($el.find('.amount-eur').length || $el.text().includes('€') || $el.html().includes('amount-eur')) return;
+        function appendSecondaryPrice($el) {
+            // Prevent double processing
+            if ($el.find('.amount-secondary').length || $el.text().includes('(') && $el.text().includes(')')) return;
 
-            // Check if this element is inside a price element that already has EUR
-            if ($el.closest('.price').find('.amount-eur').length > 0) return;
+            // Check if this element is inside a price element that already has secondary price
+            if ($el.closest('.price').find('.amount-secondary').length > 0) return;
 
-            // Improved price extraction - look for numbers followed by currency symbols
             var text = $el.text();
-            var match = text.match(/([0-9]+[.,]?[0-9]*)\s*(лв|ЛВ|лв\.|ЛВ\.|BGN|€|EUR)/i);
-            if (!match) {
-                // Try without space between number and currency
-                match = text.match(/([0-9]+[.,]?[0-9]*)(лв|ЛВ|лв\.|ЛВ\.|BGN|€|EUR)/i);
-            }
+
+            // Regex to find number
+            var match = text.match(/([0-9]+[.,]?[0-9]*)/);
             if (!match) return;
 
+            // Simple cleanup
             var priceStr = match[1].replace(',', '.');
+            // Handle cases like 1.234,56 vs 1,234.56 - this is simple heuristics, 
+            // reliable extraction happened in PHP, here is just visual enhancement for blocks
+
+            // Better heuristic: remove non-numeric except last dot/comma treating as decimal
+            // But for simple display, standard float parse often works if format is standard
             var price = parseFloat(priceStr);
 
             if (price > 0 && !isNaN(price)) {
-                var eurPrice = (price / eurRate).toFixed(2);
-                $el.append(' <span class="amount-eur">(' + eurPrice + ' €)</span>');
+                var secondaryPrice = 0;
+                var symbol = '';
+
+                if (currency === 'BGN') {
+                    // Convert to EUR
+                    secondaryPrice = (price / rate).toFixed(2);
+                    symbol = '€';
+                } else {
+                    // Convert to BGN
+                    secondaryPrice = (price * rate).toFixed(2);
+                    symbol = 'лв.';
+                }
+
+                $el.append(' <span class="amount-secondary">(' + secondaryPrice + ' ' + symbol + ')</span>');
             }
         }
 
         // Target only WooCommerce Blocks elements that PHP doesn't handle
         $('.wc-block-components-product-price__value, .wc-block-formatted-money-amount, .wc-block-components-totals-item__value').each(function () {
-            appendEur($(this));
+            appendSecondaryPrice($(this));
         });
 
+        // Add info to Cart Totals block if missing
         if ($('.wc-block-cart__totals-title').length && !$('.eur-disclaimer-blocks').length) {
             $('.wc-block-cart__totals-title').after(
                 '<div class="eur-disclaimer-blocks" style="font-size:12px;color:#777;margin-top:10px;padding:10px;background:#f9f9f9;border-radius:4px;">' +
@@ -41,12 +58,12 @@ jQuery(function ($) {
         }
     }
 
-    addEurToBlocks();
-    setTimeout(addEurToBlocks, 500);
+    addSecondaryCurrencyToBlocks();
+    setTimeout(addSecondaryCurrencyToBlocks, 500);
 
     $(document.body).on('updated_wc_block updated_cart_totals', function () {
-        setTimeout(addEurToBlocks, 100);
+        setTimeout(addSecondaryCurrencyToBlocks, 100);
     });
 
-    new MutationObserver(addEurToBlocks).observe(document.body, { childList: true, subtree: true });
-}); 
+    new MutationObserver(addSecondaryCurrencyToBlocks).observe(document.body, { childList: true, subtree: true });
+});

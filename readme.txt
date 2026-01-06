@@ -5,7 +5,7 @@ Plugin URI: https://wordpress.org/plugins/prices-in-bgn-and-eur/
 Requires at least: 5.6
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 1.7.1
+Stable tag: 1.8.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 Donate link: https://coff.ee/rezored
@@ -65,6 +65,13 @@ You can send a "thank you" through the link in the plugin settings ❤️
 2. Checkout page showing both currencies
 
 == Changelog ==
+
+= 1.8.1 =
+* NEW: Bulk Price Converter Tool - Convert your entire catalog from BGN to EUR with one click (Settings -> Price Converter).
+* NEW: Secure Remote API - Uses a dedicated microservice for safe, reliable conversion without timeouts.
+* NEW: Safety First UI - Unified "Risk Acceptance" alert processing to prevent accidental mass changes.
+* NEW: Price Display Update - Now shows "EUR (BGN)" to prioritize the future currency.
+* NEW: Persistent License Key - Pro keys are now saved in settings for easier management.
 
 = 1.7.1 =
 * Tested up to WordPress 6.9

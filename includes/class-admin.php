@@ -14,6 +14,7 @@ class Admin {
         });
         add_action('admin_menu', [$this, 'add_plugin_menu']);
         add_action('admin_notices', [$this, 'admin_notices']);
+        add_action('wp_ajax_pbe_dismiss_notice', [$this, 'dismiss_notice']);
     }
 
     public function admin_notices() {
@@ -24,6 +25,7 @@ class Admin {
 
         // Check if dismissed
         $user_id = get_current_user_id();
+        // Check for dismissal
         if (get_user_meta($user_id, 'pbe_euro_notice_dismissed', true)) {
             return;
         }
@@ -67,13 +69,24 @@ class Admin {
         <?php
     }
 
+    public function dismiss_notice() {
+        check_ajax_referer('pbe_dismiss_notice', 'nonce');
+        
+        $user_id = get_current_user_id();
+        if ($user_id) {
+            update_user_meta($user_id, 'pbe_euro_notice_dismissed', 1);
+        }
+        
+        wp_send_json_success();
+    }
+
     public function admin_styles() {
         // Icon logic
     }
 
     public function process_action_links($links) {
         $settings_link = '<a href="options-general.php?page=prices-bgn-eur-settings">' . __('Settings', 'prices-in-bgn-and-eur') . '</a>';
-        $coffee_link = '<a href="https://www.buymeacoffee.com/kalin" target="_blank" style="color:#ff813f; font-weight:bold;">' . __('Buy me a coffee', 'prices-in-bgn-and-eur') . '</a>';
+        $coffee_link = '<a href="https://buymeacoffee.com/rezored" target="_blank" style="color:#ff813f; font-weight:bold;">' . __('Buy me a coffee', 'prices-in-bgn-and-eur') . '</a>';
         array_unshift($links, $coffee_link);
         array_unshift($links, $settings_link);
         return $links;

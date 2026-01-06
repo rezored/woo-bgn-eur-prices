@@ -5,10 +5,10 @@ Plugin URI: https://wordpress.org/plugins/prices-in-bgn-and-eur/
 Requires at least: 5.6
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 1.8.4
+Stable tag: 1.8.5
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
-Donate link: https://coff.ee/rezored
+Donate link: https://buymeacoffee.com/rezored
 
 Display WooCommerce prices in BGN and EUR using the fixed BNB exchange rate. Compliant with Bulgarian law from 1 August 2025.
 
@@ -33,7 +33,7 @@ This lightweight plugin automatically adds the secondary price display alongside
 == Support ==
 
 If you find this plugin useful, please consider buying me a coffee to support the development!
-https://coff.ee/rezored
+https://buymeacoffee.com/rezored
 
 == Features ==
 - ✅ Automatic EUR price calculation from BGN  
@@ -65,6 +65,9 @@ You can send a "thank you" through the link in the plugin settings ❤️
 2. Checkout page showing both currencies
 
 == Changelog ==
+
+= 1.8.5 =
+* FIX: Made the "Pro Version" admin notice permanently dismissible.
 
 = 1.8.4 =
 * HOTFIX: Resolved "undefined variable" error in display logic.

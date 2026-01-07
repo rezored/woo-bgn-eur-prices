@@ -1,6 +1,6 @@
 === Prices in BGN and EUR & Bulk Converter ===
 Contributors: rezored
-Tags: woocommerce, bgn, euro, currency, prices, bulgaria, converter, euro zone
+Tags: woocommerce, bgn, euro, bulgaria, converter
 Plugin URI: https://wordpress.org/plugins/prices-in-bgn-and-eur/
 Requires at least: 5.6
 Tested up to: 6.9

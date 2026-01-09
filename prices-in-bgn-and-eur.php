@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Prices in BGN and EUR & Bulk Converter
  * Description: Dual currency display and secure bulk conversion tool for the BGN to EUR transition.
- * Version: 1.8.5
+ * Version: 1.8.6
  * Author: rezored
  * Requires at least: 5.8
  * Requires PHP: 7.4

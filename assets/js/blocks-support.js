@@ -51,7 +51,7 @@ jQuery(function ($) {
         // Add info to Cart Totals block if missing
         if ($('.wc-block-cart__totals-title').length && !$('.eur-disclaimer-blocks').length) {
             $('.wc-block-cart__totals-title').after(
-                '<div class="eur-disclaimer-blocks" style="font-size:12px;color:#777;margin-top:10px;padding:10px;background:#f9f9f9;border-radius:4px;">' +
+                '<div class="eur-disclaimer-blocks" style="font-size:12px;color:' + pricesBgnEurData.secondaryColor + ';margin-top:10px;padding:10px;background:#f9f9f9;border-radius:4px;">' +
                 '<em>' + pricesBgnEurData.disclaimerText + ' <br>' + pricesBgnEurData.rateText + '</em>' +
                 '</div>'
             );

@@ -12,6 +12,7 @@ class Display {
             add_action('woocommerce_cart_totals_after_order_total', [$this, 'show_cart_total_in_eur_and_note']);
             add_action('woocommerce_review_order_after_order_total', [$this, 'show_cart_total_in_eur_and_note']);
             add_action('wp_enqueue_scripts', [$this, 'enqueue_blocks_support_assets']);
+            add_action('wp_head', [$this, 'output_custom_styles']);
         }
     }
 
@@ -49,18 +50,19 @@ class Display {
         $fmt = number_format($converted, wc_get_price_decimals(), wc_get_price_decimal_separator(), wc_get_price_thousand_separator());
 
         $secondary = ($currency === 'BGN') ? $fmt . ' €' : $fmt . ' лв.';
+        $color = get_option('pbe_secondary_color', '#777777');
 
         // Goal: Always display EUR first, BGN second. i.e. "XX € (YY лв.)"
         
         // CASE 1: Store is BGN. $secondary is EUR. $price_html is BGN.
         // We want Secondary (Original).
         if ($currency === 'BGN') {
-             return '<span class="amount-eu">' . $secondary . '</span> <span class="amount-bgn" style="font-size:0.9em; color:#777; margin-left:5px;">(' . strip_tags($price_html) . ')</span>';
+             return '<span class="amount-eu">' . $secondary . '</span> <span class="amount-bgn" style="font-size:0.9em; color:' . esc_attr($color) . '; margin-left:5px;">(' . strip_tags($price_html) . ')</span>';
         }
 
         // CASE 2: Store is EUR. $secondary is BGN. $price_html is EUR.
         // We want Original (Secondary).
-        return '<span class="amount-eu">' . strip_tags($price_html) . '</span> <span class="amount-bgn" style="font-size:0.9em; color:#777; margin-left:5px;">(' . $secondary . ')</span>';
+        return '<span class="amount-eu">' . strip_tags($price_html) . '</span> <span class="amount-bgn" style="font-size:0.9em; color:' . esc_attr($color) . '; margin-left:5px;">(' . $secondary . ')</span>';
     }
 
     public function add_rate_row_email($total_rows, $order) {
@@ -73,12 +75,35 @@ class Display {
 
     public function show_cart_total_in_eur_and_note() {
         if (get_woocommerce_currency() !== 'BGN') return;
-        echo '<tr class="eur-note"><th></th><td style="font-size:12px;color:#777;"><em>' . esc_html__('1 EUR = 1.95583 BGN', 'prices-in-bgn-and-eur') . '</em></td></tr>';
+        $color = get_option('pbe_secondary_color', '#777777');
+        echo '<tr class="eur-note"><th></th><td style="font-size:12px;color:' . esc_attr($color) . ';"><em>' . esc_html__('1 EUR = 1.95583 BGN', 'prices-in-bgn-and-eur') . '</em></td></tr>';
+    }
+
+    public function output_custom_styles() {
+        $color = get_option('pbe_secondary_color', '#777777');
+        ?>
+        <style>
+            .amount-secondary, .amount-bgn, .eur-disclaimer-blocks { color: <?php echo esc_attr($color); ?> !important; }
+        </style>
+        <?php
     }
 
     public function enqueue_blocks_support_assets() {
         if (get_option('prices_bgn_eur_active', 'yes') !== 'yes') return;
-        // Enqueue assets logic (simplified for brevity, assume assets exist)
-        wp_enqueue_style('prices-bgn-eur-blocks', plugin_dir_url(dirname(__FILE__)) . 'assets/css/blocks-support.css', [], '1.8.5');
+        
+        $plugin_url = plugin_dir_url(dirname(__FILE__));
+        $color = get_option('pbe_secondary_color', '#777777');
+        
+        wp_enqueue_style('prices-bgn-eur-blocks', $plugin_url . 'assets/css/blocks-support.css', [], '1.8.6');
+        
+        wp_enqueue_script('prices-bgn-eur-blocks-js', $plugin_url . 'assets/js/blocks-support.js', ['jquery'], '1.8.6', true);
+        
+        wp_localize_script('prices-bgn-eur-blocks-js', 'pricesBgnEurData', [
+            'rate' => self::get_rate(),
+            'currency' => get_woocommerce_currency(),
+            'secondaryColor' => $color,
+            'disclaimerText' => __('Цените са изчислени по фиксирания курс на БНБ.', 'prices-in-bgn-and-eur'),
+            'rateText' => sprintf(__('1 EUR = %s BGN', 'prices-in-bgn-and-eur'), self::get_rate())
+        ]);
     }
 }

@@ -11,7 +11,13 @@ class Admin {
         add_action('admin_init', function() { 
             register_setting('prices_bgn_eur_options', 'prices_bgn_eur_active'); 
             register_setting('prices_bgn_eur_options', 'pbe_license_key');
+            register_setting('prices_bgn_eur_options', 'pbe_secondary_color', [
+                'sanitize_callback' => function($value) {
+                    return preg_match('/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/', $value) ? $value : '#777777';
+                }
+            ]);
         });
+        add_action('admin_enqueue_scripts', [$this, 'enqueue_admin_assets']);
         add_action('admin_menu', [$this, 'add_plugin_menu']);
         add_action('admin_notices', [$this, 'admin_notices']);
         add_action('wp_ajax_pbe_dismiss_notice', [$this, 'dismiss_notice']);
@@ -80,6 +86,23 @@ class Admin {
         wp_send_json_success();
     }
 
+    public function enqueue_admin_assets($hook) {
+        if ('settings_page_prices-bgn-eur-settings' !== $hook) {
+            return;
+        }
+        wp_enqueue_style('wp-color-picker');
+        wp_enqueue_script('pbe-admin-js', false, ['wp-color-picker'], false, true);
+        add_action('admin_footer', function() {
+            ?>
+            <script type="text/javascript">
+                jQuery(document).ready(function($){
+                    $('.pbe-color-field').wpColorPicker();
+                });
+            </script>
+            <?php
+        });
+    }
+
     public function admin_styles() {
         // Icon logic
     }
@@ -134,6 +157,13 @@ class Admin {
                     <th scope="row">Enable Dual Currency Display</th>
                     <td>
                         <input type="checkbox" name="prices_bgn_eur_active" value="yes" <?php checked(get_option('prices_bgn_eur_active', 'yes'), 'yes'); ?> />
+                    </td>
+                </tr>
+                <tr valign="top">
+                    <th scope="row"><?php esc_html_e('Secondary Price Color', 'prices-in-bgn-and-eur'); ?></th>
+                    <td>
+                        <input type="text" name="pbe_secondary_color" value="<?php echo esc_attr(get_option('pbe_secondary_color', '#777777')); ?>" class="pbe-color-field" data-default-color="#777777" />
+                        <p class="description"><?php esc_html_e('Choose a color for the secondary price (the one in brackets).', 'prices-in-bgn-and-eur'); ?></p>
                     </td>
                 </tr>
                 <tr valign="top">

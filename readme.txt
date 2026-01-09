@@ -5,7 +5,7 @@ Plugin URI: https://wordpress.org/plugins/prices-in-bgn-and-eur/
 Requires at least: 5.6
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 1.8.5
+Stable tag: 1.8.6
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 Donate link: https://buymeacoffee.com/rezored
@@ -72,6 +72,10 @@ You can send a "thank you" through the link in the plugin settings ❤️
 2. Checkout page showing both currencies
 
 == Changelog ==
+
+= 1.8.6 =
+* NEW: Added color customization for secondary prices in settings.
+* FIX: Removed all hardcoded color references for secondary currency display.
 
 = 1.8.5 =
 * FIX: Made the "Pro Version" admin notice permanently dismissible.

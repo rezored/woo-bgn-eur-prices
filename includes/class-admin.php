@@ -10,7 +10,9 @@ class Admin {
         add_filter('plugin_action_links_prices-in-bgn-and-eur/prices-in-bgn-and-eur.php', [$this, 'process_action_links']);
         add_action('admin_init', function() { 
             register_setting('prices_bgn_eur_options', 'prices_bgn_eur_active'); 
-            register_setting('prices_bgn_eur_options', 'pbe_license_key');
+            register_setting('prices_bgn_eur_options', 'pbe_license_key', [
+                'sanitize_callback' => 'sanitize_text_field'
+            ]);
             register_setting('prices_bgn_eur_options', 'pbe_secondary_color', [
                 'sanitize_callback' => function($value) {
                     return preg_match('/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/', $value) ? $value : '#777777';

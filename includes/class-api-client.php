@@ -16,7 +16,7 @@ class API_Client {
      */
     public static function convert_batch($items, $license_key, $rounding_rule) {
         $body = [
-            'api_key'       => $license_key ?: 'FREE',
+            'api_key'       => $license_key ? trim($license_key) : 'FREE',
             'site_url'      => get_site_url(),
             'rounding_rule' => $rounding_rule,
             'items'         => $items
